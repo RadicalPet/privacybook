@@ -356,48 +356,94 @@ $.fn.sendMessage = function(){
     }
     users.user[senderId][senderId].push(tempObj);
   }
-
+  localStorage.users = JSON.stringify(users); 
   $('#send-message-modal').modal('hide');
 }
 function listMessages(){
   $("#accordion").empty();
+  //for the amount of users
   for (var i = 0; i < users.user.length; i++){
-    if (users.user[i][localStorage.loggedIn] && i != parseInt(localStorage.loggedIn)){
+    
+    //for the received messages (received messages have the sender-id as propertyname, sent messages the logged-in user id)
+    if (users.user[localStorage.loggedIn][i] && i != localStorage.loggedIn){
+      
+      //create panel for this sender of the messages
       $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title">'+ users.user[i].userName + '<button type="button" title="send&nbsp;message" id="send-message-btn" class="btn btn-default btn-sm icon-two"><span class="glyphicon glyphicon-send"></span></button><button type="button" title="view&nbsp;conversation" id="view-converstion-btn" class="btn btn-default btn-sm icon-two" data-toggle="collapse" data-target="#convo-'+ i +'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
       $("#accordion").find(".panel-default:last-child").append('<div id="convo-'+ i +'" class="panel-collapse collapse convo"><div class="panel-body"></div></div>');
+      
+      //create empty arrray for the messages
       var theseMessages = [];
-      for (var j = 0; j < users.user[i][localStorage.loggedIn].length; j++){
-        var tempObj = users.user[i][localStorage.loggedIn][j];
+     
+      for (var j = 0; j < users.user[localStorage.loggedIn][i].length; j++){
+        
+        var tempObj = users.user[localStorage.loggedIn][i][j];
+        //console.log(tempObj);
         var newProp = {senderId : i};
         tempObj = $.extend(tempObj, newProp);
         theseMessages.push(tempObj);
+      
       }
-      if(users.user[localStorage.loggedIn][i]){
-        for (var k = 0; k < users.user[localStorage.loggedIn][i].length; k++){
-          theseMessages.push(users.user[localStorage.loggedIn][i][k]);
+      if (users.user[localStorage.loggedIn][localStorage.loggedIn]){
+        for (var k = 0; k < users.user[localStorage.loggedIn][localStorage.loggedIn].length; k++){
+           if (parseInt(users.user[localStorage.loggedIn][localStorage.loggedIn][k].receiverId) == i){
+            theseMessages.push(users.user[localStorage.loggedIn][localStorage.loggedIn][k]);
+            //console.log(users.user[localStorage.loggedIn][localStorage.loggedIn][k]);    
+          }
         }
-      }
+      }   
+      
       var realArray = $.makeArray(theseMessages);
+      
       function sortByTimestamp(a, b){
         return a.timestamp - b.timestamp;
       }
+      
       realArray.sort(sortByTimestamp);
+      console.log(realArray);
       realArray.reverse();
       console.log(realArray);
+      
       for (var l = 0; l < realArray.length; l++){
         if (realArray[l].senderId){
+  
           var thisTimestamp = String(new Date(realArray[l].timestamp));
           thisTimestamp = thisTimestamp.substr(0, 24);
-          $("#convo-"+ i +"").find(".panel-body").append('<div class="sender"><p class="timestamp">'+thisTimestamp+'</p>'+realArray[l].message+'</div><br>');
+          $("#convo-"+ i +"").find(".panel-body").append('<div class="sender"><p class="timestamp">'+thisTimestamp+'</p>'+realArray[l].message+'</div>');
         }
         else{
           var thisTimestamp = String(new Date(realArray[l].timestamp));
           thisTimestamp = thisTimestamp.substr(0, 24);
-          $("#convo-"+ i +"").find(".panel-body").append('<div class="receiver">'+thisTimestamp+'<br>'+realArray[l].message+'</div>');
+          $("#convo-"+ i +"").find(".panel-body").append('<div class="receiver"><p class="timestamp">'+thisTimestamp+'</p>'+realArray[l].message+'</div>');
         }
       }
     }
   }
+  if (users.user[localStorage.loggedIn][localStorage.loggedIn]){
+    var thoseMessages = [];
+    for (var k = 0; k < users.user[localStorage.loggedIn][localStorage.loggedIn].length; k++){
+      var oneWayConvo = users.user[localStorage.loggedIn][localStorage.loggedIn][k];
+      
+      thoseMessages.push(oneWayConvo);
+            
+      if ($("#convo-"+oneWayConvo.receiverId+"").length == 0){
+
+        $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title">'+ users.user[oneWayConvo.receiverId].userName + '<button type="button" title="send&nbsp;message" id="send-message-btn" class="btn btn-default btn-sm icon-two"><span class="glyphicon glyphicon-send"></span></button><button type="button" title="view&nbsp;conversation" id="view-converstion-btn" class="btn btn-default btn-sm icon-two" data-toggle="collapse" data-target="#convo-'+ oneWayConvo.receiverId +'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
+        $("#accordion").find(".panel-default:last-child").append('<div id="convo-'+ oneWayConvo.receiverId +'" class="panel-collapse collapse convo oneway"><div class="panel-body"></div></div>');
+    
+      }
+    }
+    var realArrayAgain = $.makeArray(thoseMessages);
+        realArrayAgain.sort(sortByTimestamp);
+        realArrayAgain.reverse();
+
+    for (var l = 0; l < realArrayAgain.length; l++){
+      if ($("#convo-"+ realArrayAgain[l].receiverId +"").hasClass('oneway')){
+        var thisTimestamp = String(new Date(realArrayAgain[l].timestamp));
+            thisTimestamp = thisTimestamp.substr(0, 24);
+        $("#convo-"+ realArrayAgain[l].receiverId +"").find(".panel-body").append('<div class="receiver"><p class="timestamp">'+thisTimestamp+'</p>'+realArrayAgain[l].message+'</div>');
+      }    
+    }
+  } 
 }
 
 $("#reg-name").keyup($.fn.valName);

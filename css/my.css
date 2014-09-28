@@ -301,15 +301,21 @@ h3 > .tooltip.top .tooltip-arrow {
 .convo{
   padding-top: 10px;
 }
-.sender{
+.sender, .receiver{
   position: relative;
   background-color: white;
   width: 280px;
   margin-left: 0px;
+  margin-top: 10px;
   padding: 2px;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+}
+.receiver{
+  margin-left: 100px;
+  background-color: black;
+  color: white;
 }
 .sender:after{
   content: '';
@@ -323,13 +329,18 @@ h3 > .tooltip.top .tooltip-arrow {
   left: -13px;
   top: 5px;
 }
-.receiver{
-  position: relative;
-  width: 280px;
-  float: right;
-  background-color: black;
-  color: white;
-  margin-top: 10px;
+
+.receiver:after{
+  content: '';
+  position: absolute;
+  border-style: solid;
+  border-width: 10px 0px 10px 13px;
+  border-color: transparent #000;
+  display: block;
+  width: 0;
+  z-index: 1;
+  right: -13px;
+  top: 5px;
 }
 .panel, .panel-body{
   background-color: rgb(104, 214, 255);
@@ -345,5 +356,5 @@ h3 > .tooltip.top .tooltip-arrow {
 }
 .timestamp{
   font-size: 80%;
-  color: rgba(0,0,0,0.5);
+  color: gray;
 }
