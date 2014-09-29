@@ -1,5 +1,6 @@
 html, body
 {
+  position: relative;
   font-family: Orbitron, sans-serif;
   height: 100%;
   width: 99%;
@@ -304,7 +305,7 @@ h3 > .tooltip.top .tooltip-arrow {
 .sender, .receiver{
   position: relative;
   background-color: white;
-  width: 280px;
+  width: 60%;
   margin-left: 0px;
   margin-top: 10px;
   padding: 2px;
@@ -313,7 +314,7 @@ h3 > .tooltip.top .tooltip-arrow {
   border-radius: 4px;
 }
 .receiver{
-  margin-left: 150px;
+  margin-left: 40%;
   background-color: black;
   color: white;
 }
@@ -364,7 +365,7 @@ h3 > .tooltip.top .tooltip-arrow {
 }
 .message-input{
   border: solid white 3px;
-   -webkit-border-radius: 3px;
+  -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
   margin-top: -10px;

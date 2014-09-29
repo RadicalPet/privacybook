@@ -130,6 +130,21 @@ $( document ).ready(function() {
         placement: 'top',
         animation: 'true'
     });
+ $('.navbar-fixed-top').scrollspy();
+ var offsetHeight = $(window).height() * 0.2;
+
+ $('body').scrollspy({
+   offset: offsetHeight
+});
+
+ $('[data-spy="scroll"]').each(function () {
+  var $spy = $(this).scrollspy('refresh');
+})
+
+
+
+
+
   $("#accordion").on('shown.bs.collapse', function () {
     var active = $("#accordion .in").attr('id');
     $.cookie('activeAccordionGroup', active);
@@ -147,10 +162,12 @@ $( document ).ready(function() {
   }
 });
 _.throttle($( window ).resize(function() {
-  location.reload(true);
+  location.reload();
 }), 100);
 
-
+/**$('.navbar-fixed-top').on('activate.bs.scrollspy', function () {
+  window.location.hash = $(".navbar-fixed-top").find(".active").find("a").attr("href");
+});**/
 
 
 $.fn.valName = function(){
@@ -655,6 +672,8 @@ function resizeMessageInput(currentDiv){
   if (window.innerWidth < 992){
     $("#messages").find(".message-form").prependTo(""+currentDiv +"");
     $("#messages").find("fieldset").css("margin-top", "0px");
+    $("#messages").find("fieldset").css("margin-left", "4%");
+
 
   }
 }
