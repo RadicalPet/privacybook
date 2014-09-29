@@ -307,14 +307,26 @@ function addTagsToUser(){
 }
 $.fn.addMessageDetails = function(){
   $("#send-message-label").html("send message to " + $(this).data("user"));
-  $("#send-message-confirm").data('index', $(this).data("index"));
+  $("#send-message-from-modal-confirm").data('index', $(this).data("index"));
 }
-$.fn.sendMessage = function(){
+$.fn.setModalMessageData = function(){
   var senderId = localStorage.loggedIn;
   var receiverId = $(this).data("index");
-  var message = $("#message").val();
+  var message = $("#message-in-modal").val();
   var timestamp = Date.now();
 
+  $.fn.sendMessage(senderId, receiverId, message, timestamp);
+}
+$.fn.setListMessageData = function(){
+  var senderId = localStorage.loggedIn;
+  var receiverId = $(this).data("index");
+  var message = $("#message-in-list").val();
+  var timestamp = Date.now();
+
+  $.fn.sendMessage(senderId, receiverId, message, timestamp);
+}
+$.fn.sendMessage = function(senderId, receiverId, message, timestamp){
+ 
   if (!users.user[parseInt(receiverId)][senderId]){
 
     var tempObj =  {};
@@ -368,7 +380,7 @@ function listMessages(){
     if (users.user[localStorage.loggedIn][i] && i != localStorage.loggedIn){
       
       //create panel for this sender of the messages
-      $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title">'+ users.user[i].userName + '<button type="button" title="send&nbsp;message" id="send-message-btn" class="btn btn-default btn-sm icon-two"><span class="glyphicon glyphicon-send"></span></button><button type="button" title="view&nbsp;conversation" id="view-converstion-btn" class="btn btn-default btn-sm icon-two" data-toggle="collapse" data-target="#convo-'+ i +'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
+      $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title">'+ users.user[i].userName + '<button type="button" title="send&nbsp;message" class="message-from-list-btn btn btn-default btn-sm icon-two" data-toggle="collapse" data-target="#send-message-from-list"><span class="glyphicon glyphicon-send"></span></button><button type="button" title="view&nbsp;conversation" class="btn btn-default btn-sm icon-two view-convo" data-toggle="collapse" data-target="#convo-'+ i +'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
       $("#accordion").find(".panel-default:last-child").append('<div id="convo-'+ i +'" class="panel-collapse collapse convo"><div class="panel-body"></div></div>');
       
       //create empty arrray for the messages
@@ -377,7 +389,7 @@ function listMessages(){
       for (var j = 0; j < users.user[localStorage.loggedIn][i].length; j++){
         
         var tempObj = users.user[localStorage.loggedIn][i][j];
-        //console.log(tempObj);
+       
         var newProp = {senderId : i};
         tempObj = $.extend(tempObj, newProp);
         theseMessages.push(tempObj);
@@ -387,7 +399,7 @@ function listMessages(){
         for (var k = 0; k < users.user[localStorage.loggedIn][localStorage.loggedIn].length; k++){
            if (parseInt(users.user[localStorage.loggedIn][localStorage.loggedIn][k].receiverId) == i){
             theseMessages.push(users.user[localStorage.loggedIn][localStorage.loggedIn][k]);
-            //console.log(users.user[localStorage.loggedIn][localStorage.loggedIn][k]);    
+            
           }
         }
       }   
@@ -398,10 +410,9 @@ function listMessages(){
         return a.timestamp - b.timestamp;
       }
       
-      realArray.sort(sortByTimestamp);
-      console.log(realArray);
+      realArray.sort(sortByTimestamp); 
       realArray.reverse();
-      console.log(realArray);
+    
       
       for (var l = 0; l < realArray.length; l++){
         if (realArray[l].senderId){
@@ -427,7 +438,7 @@ function listMessages(){
             
       if ($("#convo-"+oneWayConvo.receiverId+"").length == 0){
 
-        $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title">'+ users.user[oneWayConvo.receiverId].userName + '<button type="button" title="send&nbsp;message" id="send-message-btn" class="btn btn-default btn-sm icon-two"><span class="glyphicon glyphicon-send"></span></button><button type="button" title="view&nbsp;conversation" id="view-converstion-btn" class="btn btn-default btn-sm icon-two" data-toggle="collapse" data-target="#convo-'+ oneWayConvo.receiverId +'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
+        $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title">'+ users.user[oneWayConvo.receiverId].userName + '<button type="button" title="send&nbsp;message" class="message-from-list-btn btn btn-default btn-sm icon-two" data-toggle="collapse" data-target="#send-message-from-list"><span class="glyphicon glyphicon-send"></span></button><button type="button" title="view&nbsp;conversation" class="btn btn-default btn-sm icon-two view-convo" data-toggle="collapse" data-target="#convo-'+ oneWayConvo.receiverId +'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
         $("#accordion").find(".panel-default:last-child").append('<div id="convo-'+ oneWayConvo.receiverId +'" class="panel-collapse collapse convo oneway"><div class="panel-body"></div></div>');
     
       }
@@ -443,7 +454,14 @@ function listMessages(){
         $("#convo-"+ realArrayAgain[l].receiverId +"").find(".panel-body").append('<div class="receiver"><p class="timestamp">'+thisTimestamp+'</p>'+realArrayAgain[l].message+'</div>');
       }    
     }
-  } 
+  }
+  $('.message-from-list-btn').on("click", $.fn.addMessageData); 
+}
+$.fn.addMessageData = function(){
+  var target = $(this).parent().find(".view-convo").data("target");
+  var receiverId = target.slice(7, target.length);
+  $("#send-message-from-list-confirm").data('index', receiverId);
+  $("#legendary").html("Send message to "+users.user[receiverId].userName+"");
 }
 
 $("#reg-name").keyup($.fn.valName);
@@ -456,5 +474,7 @@ $('#log-out-confirm').on("click", logout);
 $('#add-info-btn').on("click", addInfoForm);
 $('#add-info-confirm').on("click", addInfo);
 $('#show-edit-info').on("click", showEditInfo);
-$('#send-message-confirm').on("click", $.fn.sendMessage);
+$('#send-message-from-modal-confirm').on("click", $.fn.setModalMessageData);
+$('#send-message-from-list-confirm').on("click", $.fn.setListMessageData);
+
 

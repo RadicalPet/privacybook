@@ -185,7 +185,34 @@
                 <div class="panel-group" id="accordion">
             
                 </div>
+
               </div><!-- / COLUMN-LEFT -->
+              
+              <div class="col-md-6"><!-- COLUMN-RIGHT -->
+                <div class="collapse" id="send-message-from-list">
+                    
+                  <form class="form-horizontal">
+                    <fieldset>
+                    <legend id="legendary"></legend>
+
+                      <div class="form-group">
+                        <div class="col-md-8">
+                          <div class="input-group">
+                            <textarea id="message-in-list" name="message" class="message form-control"></textarea>
+                          </div>
+                        </div>
+                      </div>
+
+                    </fieldset>
+                  </form>
+                 
+                  <button id="send-message-from-list-confirm" type="button" class="btn btn-primary">
+                    Send
+                  </button>
+                
+                </div><!-- / collapse -->
+              </div><!-- / COLUMN-RIGHT -->
+            
             </div><!-- /.row -->
           </div>
         </div>
@@ -449,7 +476,7 @@
           <div class="form-group">
             <div class="col-md-8">
               <div class="input-group">
-                <textarea id="message" name="message" class="form-control"></textarea>
+                <textarea id="message-in-modal" name="message" class="form-control"></textarea>
               </div>
             </div>
           </div>
@@ -464,7 +491,7 @@
             <button type="button" class="btn btn-default" 
                data-dismiss="modal">Dismiss
             </button>
-            <button id="send-message-confirm" type="button" class="btn btn-primary">
+            <button id="send-message-from-modal-confirm" type="button" class="btn btn-primary">
                 Send
             </button>
          </div>
