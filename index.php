@@ -196,20 +196,18 @@
                     <legend id="legendary"></legend>
 
                       <div class="form-group">
-                        <div class="col-md-8">
-                          <div class="input-group">
-                            <textarea id="message-in-list" name="message" class="message form-control"></textarea>
+                        
+                          <div class="input-group message-input">
+                            <textarea id="message-in-list" name="message" class="form-control"></textarea>
+                              <button id="send-message-from-list-confirm" type="button" class="btn btn-sm form-control">
+                                Send
+                              </button>
                           </div>
-                        </div>
                       </div>
 
                     </fieldset>
                   </form>
-                 
-                  <button id="send-message-from-list-confirm" type="button" class="btn btn-primary">
-                    Send
-                  </button>
-                
+              
                 </div><!-- / collapse -->
               </div><!-- / COLUMN-RIGHT -->
             
