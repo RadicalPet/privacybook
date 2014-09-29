@@ -126,25 +126,26 @@ $( document ).ready(function() {
     $(".logged-in").hide();
     $(".logged-out").show();
   }
- $("[title]").tooltip({
-        placement: 'top',
-        animation: 'true'
-    });
- $('.navbar-fixed-top').scrollspy();
- var offsetHeight = $(window).height() * 0.2;
 
- $('body').scrollspy({
-   offset: offsetHeight
-});
+/**TOOLTIP**/  
+  $("[title]").tooltip({
+    placement: 'top',
+    animation: 'true'
+  });
 
- $('[data-spy="scroll"]').each(function () {
-  var $spy = $(this).scrollspy('refresh');
-})
+/**SCROLLSPY**/
+  $('.navbar-fixed-top').scrollspy();
+  var offsetHeight = $(window).height() * 0.2;
 
+  $('body').scrollspy({
+    offset: offsetHeight
+  });
 
+  $('[data-spy="scroll"]').each(function () {
+    var $spy = $(this).scrollspy('refresh');
+  })
 
-
-
+/**ACCORDION**/
   $("#accordion").on('shown.bs.collapse', function () {
     var active = $("#accordion .in").attr('id');
     $.cookie('activeAccordionGroup', active);
@@ -161,6 +162,7 @@ $( document ).ready(function() {
     $("#" + last).addClass("in");
   }
 });
+
 _.throttle($( window ).resize(function() {
   location.reload();
 }), 100);
@@ -169,6 +171,8 @@ _.throttle($( window ).resize(function() {
   window.location.hash = $(".navbar-fixed-top").find(".active").find("a").attr("href");
 });**/
 
+
+/**REGISTER / LOGIN / LOGOUT**/
 
 $.fn.valName = function(){
  
@@ -326,49 +330,11 @@ function logout(){
   $('.logged-in').hide();
   $('.logged-out').show(); 
 }
-function addInfoForm(){
-  var thisUser = users.user[localStorage.loggedIn];
-  if (!thisUser.userLocation || thisUser.userLocation.length < 1){
-    $('#add-info-form').append('<div class="form-group"><label class="col-md-4 control-label" for="location">location</label><div class="col-md-6"><input id="location" name="location" type="text" placeholder="" class="form-control input-md"></div></div>');
-  }
-  if (!thisUser.about || thisUser.about.length < 1){
-    $('#add-info-form').append('<div class="form-group"><label class="col-md-4 control-label" for="about">about yourself</label><div class="col-md-6"><textarea class="form-control" id="about" name="about"></textarea></div></div>');
-  }
-  if (!thisUser.interests || thisUser.interests.length < 1){
-    $('#add-info-form').append('<div class="form-group"><label class="col-md-4 control-label" for="interests">general interests</label><div class="col-md-6"><textarea class="form-control" id="interests" name="interests"></textarea></div></div>');
-  }
-}
-function addInfo(){
-  var userLocation = $('#location').val();
-  var about = $('#about').val();
-  var interests = $('#interests').val();
 
-  var tempObj =  {
-    userLocation : userLocation, 
-    about : about, 
-    interests : interests
-  }
-  
-  users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
-  localStorage.users = JSON.stringify(users); 
-  $('#add-info-modal').modal('hide'); 
-}
-function submitEditedInfo(){
 
-  var userLocation = $('#edit-user-location').val();
-  var about = $('#edit-user-about').val();
-  var interests = $('#edit-user-interests').val();
 
-  var tempObj =  {
-    userLocation : userLocation, 
-    about : about, 
-    interests : interests
-  }
+/**DISPLAY STUFF**/
 
-  users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
-  localStorage.users = JSON.stringify(users); 
-  showInfo();
-}
 function loadProfileData(){
 
   var i = parseInt(localStorage.getItem("loggedIn"));
@@ -408,130 +374,6 @@ function showInfo(){
       $("#info").find("ul").append('<li>' + tagList[i] + '</li>');
     });
   }
-}
-function showEditInfo(){
-  $("#show-edit-info").addClass("disabled");
-  var thisUser = users.user[localStorage.loggedIn];
-  var infos = $("#info").find(".content").find("div");
-  $("#info").find(".content").prepend('<form class="form-horizontal" id="edit-info-form"></form>');
-
-  $.each( infos, function( key, value ) {
-    var oldId = $(infos[key]).context.id;
-    var oldValue = $(infos[key]).html();
-
-
-    if ($(infos[key]).html().length < 20){
-      $(infos[key]).html('<div class="form-group"><div class="col-md-8"><input id="edit-'+ oldId +'" name="location" type="text" value="' +  oldValue + '"class="form-control input-md"></div></div>');
-    }
-    else{
-      $(infos[key]).html('<div class="form-group"><div class="col-md-8"><textarea id="edit-'+ oldId +'" class="form-control">' +  oldValue + '</textarea></div></div>');
-    }
-    $('#edit-info-form').append($(infos[key]).prev());
-    $('#edit-info-form').append($(infos[key]));
-  });
-  $("#edit-info-form").append('<div class="form-group"><div class="col-md-8"><button id="edit-confirm-btn" type="button" class="btn btn-success">Save Changes</button><button id="edit-dismiss-btn" type="button" class="btn btn-danger">Dismiss</button></div></div>');
-  $('#edit-confirm-btn').on("click", submitEditedInfo);
-  $('#edit-dismiss-btn').on('click', showInfo);
-}
-function restOfTagsAsCheckboxes(){
-  var thisUser = users.user[localStorage.loggedIn];
-  $('#info').find(".content").append('<form id="tag-checkbox" class="form-horizontal"><fieldset><div class="form-group"></div></fieldset></form>');
-
-  for (var i = 0; i < tagList.length; i++){
-    var doNotAdd = false;
-    var str = String(i);
-    for (var j = 0; j < thisUser.tagList.length; j++){
-      if (str == thisUser.tagList[j]){
-        doNotAdd = true;
-      }
-    }
-    if (!doNotAdd){
-      $('#tag-checkbox').find(".form-group").append('<div class="checkbox"><label for="tags-'+ str +'">' + tagList[i] + '<input type="checkbox" class="tags" id="tags-'+ str +'" value="'+ str +'"></label></div>');   
-    }
-  }
-  $('#tag-checkbox').append('<button id="add-tags-to-user" type="button" class="btn btn-primary">Submit</button>') 
-  $('#add-tags-to-user').on("click", addTagsToUser);
-}
-function addTagsToUser(){
-  var thisUser = users.user[localStorage.loggedIn];
-  var tags = $('input:checkbox:checked').map(function() { return this.value;}).get();
-  
-  var tempObj =  {tagList : tags};
-
-  users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
-  localStorage.users = JSON.stringify(users); 
-}
-$.fn.addMessageDetails = function(){
-  $("#send-message-label").html("send message to " + $(this).data("user"));
-  $("#send-message-from-modal-confirm").data('index', $(this).data("index"));
-}
-$.fn.setModalMessageData = function(){
-  var senderId = localStorage.loggedIn;
-  var receiverId = $(this).data("index");
-  var message = $("#message-in-modal").val();
-  var timestamp = Date.now();
-
-  $.fn.sendMessage(senderId, receiverId, message, timestamp);
-}
-$.fn.setListMessageData = function(){
-
-  var senderId = localStorage.loggedIn;
-  var receiverId = $(this).data("index");
- 
-  var message = $("#message-in-list").val();
-  var timestamp = Date.now();
-
-
-
-  $.fn.sendMessage(senderId, receiverId, message, timestamp);
-  $("#message-in-list").val('');
-  listMessages();
-}
-$.fn.sendMessage = function(senderId, receiverId, message, timestamp){
- 
-  if (!users.user[parseInt(receiverId)][senderId]){
-
-    var tempObj =  {};
-    tempObj[senderId] = [{  
-      message : message,
-      timestamp : timestamp
-    }];
-    
-    users.user[parseInt(receiverId)] = $.extend(users.user[parseInt(receiverId)], tempObj);
-    localStorage.users = JSON.stringify(users); 
-   
-  }
-  else{
-
-    var tempObj = {
-      message: message, 
-      timestamp : timestamp
-    }
-    users.user[parseInt(receiverId)][senderId].push(tempObj);
-   
-  }
-  if (!users.user[senderId][senderId]){
-    
-    var tempObj =  {};
-    tempObj[senderId] = [{  
-      message : message,
-      timestamp : timestamp,
-      receiverId : receiverId
-    }];
-    
-    users.user[senderId] = $.extend(users.user[senderId], tempObj);
-    localStorage.users = JSON.stringify(users); 
-  }
-  else{
-    var tempObj = {
-      message: message, 
-      timestamp : timestamp,
-      receiverId : receiverId
-    }
-    users.user[senderId][senderId].push(tempObj);
-  }
-  localStorage.users = JSON.stringify(users); 
-  $('#send-message-modal').modal('hide');
 }
 function listMessages(){
 
@@ -637,6 +479,117 @@ function listMessages(){
   }
 }
 
+/**ADD INFO**/
+
+function addInfoForm(){
+  var thisUser = users.user[localStorage.loggedIn];
+  if (!thisUser.userLocation || thisUser.userLocation.length < 1){
+    $('#add-info-form').append('<div class="form-group"><label class="col-md-4 control-label" for="location">location</label><div class="col-md-6"><input id="location" name="location" type="text" placeholder="" class="form-control input-md"></div></div>');
+  }
+  if (!thisUser.about || thisUser.about.length < 1){
+    $('#add-info-form').append('<div class="form-group"><label class="col-md-4 control-label" for="about">about yourself</label><div class="col-md-6"><textarea class="form-control" id="about" name="about"></textarea></div></div>');
+  }
+  if (!thisUser.interests || thisUser.interests.length < 1){
+    $('#add-info-form').append('<div class="form-group"><label class="col-md-4 control-label" for="interests">general interests</label><div class="col-md-6"><textarea class="form-control" id="interests" name="interests"></textarea></div></div>');
+  }
+}
+function addInfo(){
+  var userLocation = $('#location').val();
+  var about = $('#about').val();
+  var interests = $('#interests').val();
+
+  var tempObj =  {
+    userLocation : userLocation, 
+    about : about, 
+    interests : interests
+  }
+  
+  users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
+  localStorage.users = JSON.stringify(users); 
+  $('#add-info-modal').modal('hide'); 
+}
+
+/**EDITING**/
+
+
+function showEditInfo(){
+  $("#show-edit-info").addClass("disabled");
+  var thisUser = users.user[localStorage.loggedIn];
+  var infos = $("#info").find(".content").find("div");
+  $("#info").find(".content").prepend('<form class="form-horizontal" id="edit-info-form"></form>');
+
+  $.each( infos, function( key, value ) {
+    var oldId = $(infos[key]).context.id;
+    var oldValue = $(infos[key]).html();
+
+
+    if ($(infos[key]).html().length < 20){
+      $(infos[key]).html('<div class="form-group"><div class="col-md-8"><input id="edit-'+ oldId +'" name="location" type="text" value="' +  oldValue + '"class="form-control input-md"></div></div>');
+    }
+    else{
+      $(infos[key]).html('<div class="form-group"><div class="col-md-8"><textarea id="edit-'+ oldId +'" class="form-control">' +  oldValue + '</textarea></div></div>');
+    }
+    $('#edit-info-form').append($(infos[key]).prev());
+    $('#edit-info-form').append($(infos[key]));
+  });
+  $("#edit-info-form").append('<div class="form-group"><div class="col-md-8"><button id="edit-confirm-btn" type="button" class="btn btn-success">Save Changes</button><button id="edit-dismiss-btn" type="button" class="btn btn-danger">Dismiss</button></div></div>');
+  $('#edit-confirm-btn').on("click", submitEditedInfo);
+  $('#edit-dismiss-btn').on('click', showInfo);
+}
+function submitEditedInfo(){
+
+  var userLocation = $('#edit-user-location').val();
+  var about = $('#edit-user-about').val();
+  var interests = $('#edit-user-interests').val();
+
+  var tempObj =  {
+    userLocation : userLocation, 
+    about : about, 
+    interests : interests
+  }
+
+  users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
+  localStorage.users = JSON.stringify(users); 
+  showInfo();
+}
+
+/**TAGS TAGS TAGS**/
+
+function restOfTagsAsCheckboxes(){
+  var thisUser = users.user[localStorage.loggedIn];
+  $('#info').find(".content").append('<form id="tag-checkbox" class="form-horizontal"><fieldset><div class="form-group"></div></fieldset></form>');
+
+  for (var i = 0; i < tagList.length; i++){
+    var doNotAdd = false;
+    var str = String(i);
+    for (var j = 0; j < thisUser.tagList.length; j++){
+      if (str == thisUser.tagList[j]){
+        doNotAdd = true;
+      }
+    }
+    if (!doNotAdd){
+      $('#tag-checkbox').find(".form-group").append('<div class="checkbox"><label for="tags-'+ str +'">' + tagList[i] + '<input type="checkbox" class="tags" id="tags-'+ str +'" value="'+ str +'"></label></div>');   
+    }
+  }
+  $('#tag-checkbox').append('<button id="add-tags-to-user" type="button" class="btn btn-primary">Submit</button>') 
+  $('#add-tags-to-user').on("click", addTagsToUser);
+}
+function addTagsToUser(){
+  var thisUser = users.user[localStorage.loggedIn];
+  var tags = $('input:checkbox:checked').map(function() { return this.value;}).get();
+  
+  var tempObj =  {tagList : tags};
+
+  users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
+  localStorage.users = JSON.stringify(users); 
+}
+
+/**MESSAGING STUFF**/
+
+$.fn.addMessageDetails = function(){
+  $("#send-message-label").html("send message to " + $(this).data("user"));
+  $("#send-message-from-modal-confirm").data('index', $(this).data("index"));
+}
 $.fn.addMessageData = function(){
   var target = $(this).parent().find(".view-convo").data("target");
   var receiverId = target.slice(7, target.length);
@@ -653,6 +606,85 @@ $.fn.addMessageData = function(){
   $("#messages").find("fieldset").css("margin-top", ""+relativeOffset+"px");
   resizeMessageInput(currentDiv);
 }
+$.fn.setModalMessageData = function(){
+  var senderId = localStorage.loggedIn;
+  var receiverId = $(this).data("index");
+  var message = $("#message-in-modal").val();
+  var timestamp = Date.now();
+
+  $.fn.sendMessage(senderId, receiverId, message, timestamp);
+}
+$.fn.setListMessageData = function(){
+
+  var senderId = localStorage.loggedIn;
+  var receiverId = $(this).data("index");
+ 
+  var message = $("#message-in-list").val();
+  var timestamp = Date.now();
+
+
+
+  $.fn.sendMessage(senderId, receiverId, message, timestamp);
+  $("#message-in-list").val('');
+  listMessages();
+}
+$.fn.sendMessage = function(senderId, receiverId, message, timestamp){
+ 
+  if (!users.user[parseInt(receiverId)][senderId]){
+
+    var tempObj =  {};
+    tempObj[senderId] = [{  
+      message : message,
+      timestamp : timestamp
+    }];
+    
+    users.user[parseInt(receiverId)] = $.extend(users.user[parseInt(receiverId)], tempObj);
+    localStorage.users = JSON.stringify(users); 
+   
+  }
+  else{
+
+    var tempObj = {
+      message: message, 
+      timestamp : timestamp
+    }
+    users.user[parseInt(receiverId)][senderId].push(tempObj);
+   
+  }
+  if (!users.user[senderId][senderId]){
+    
+    var tempObj =  {};
+    tempObj[senderId] = [{  
+      message : message,
+      timestamp : timestamp,
+      receiverId : receiverId
+    }];
+    
+    users.user[senderId] = $.extend(users.user[senderId], tempObj);
+    localStorage.users = JSON.stringify(users); 
+  }
+  else{
+    var tempObj = {
+      message: message, 
+      timestamp : timestamp,
+      receiverId : receiverId
+    }
+    users.user[senderId][senderId].push(tempObj);
+  }
+  localStorage.users = JSON.stringify(users); 
+  $('#send-message-modal').modal('hide');
+}
+function resizeMessageInput(currentDiv){
+  if (window.innerWidth < 992){
+    $("#messages").find(".message-form").prependTo(""+currentDiv +"");
+    $("#messages").find("fieldset").css("margin-top", "0px");
+    $("#messages").find("fieldset").css("margin-left", "4%");
+  }
+}
+
+
+
+/**HANDLERS - duh! **/
 
 $("#reg-name").keyup($.fn.valName);
 $("#reg-password").keyup($.fn.valPassword);
@@ -668,12 +700,3 @@ $('#send-message-from-modal-confirm').on("click", $.fn.setModalMessageData);
 $('#send-message-from-list-confirm').on("click", $.fn.setListMessageData);
 
 
-function resizeMessageInput(currentDiv){
-  if (window.innerWidth < 992){
-    $("#messages").find(".message-form").prependTo(""+currentDiv +"");
-    $("#messages").find("fieldset").css("margin-top", "0px");
-    $("#messages").find("fieldset").css("margin-left", "4%");
-
-
-  }
-}
