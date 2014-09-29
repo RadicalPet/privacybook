@@ -188,7 +188,7 @@
 
               </div><!-- / COLUMN-LEFT -->
               
-              <div class="col-md-6"><!-- COLUMN-RIGHT -->
+              <div class="message-form col-md-6"><!-- COLUMN-RIGHT -->
                 <div class="collapse" id="send-message-from-list">
                     
                   <form class="form-horizontal">

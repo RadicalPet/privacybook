@@ -120,7 +120,7 @@ $( document ).ready(function() {
   if (parseInt(localStorage.loggedIn) > -1){
     $(".logged-in").show();
     $(".logged-out").hide();
-    loadProfileData();
+    _.throttle(loadProfileData(), 100);
   }
   else{
     $(".logged-in").hide();
@@ -146,6 +146,11 @@ $( document ).ready(function() {
     $("#" + last).addClass("in");
   }
 });
+_.throttle($( window ).resize(function() {
+  location.reload(true);
+}), 100);
+
+
 
 
 $.fn.valName = function(){
@@ -452,10 +457,14 @@ $.fn.setModalMessageData = function(){
   $.fn.sendMessage(senderId, receiverId, message, timestamp);
 }
 $.fn.setListMessageData = function(){
+
   var senderId = localStorage.loggedIn;
   var receiverId = $(this).data("index");
+ 
   var message = $("#message-in-list").val();
   var timestamp = Date.now();
+
+
 
   $.fn.sendMessage(senderId, receiverId, message, timestamp);
   $("#message-in-list").val('');
@@ -593,7 +602,8 @@ function listMessages(){
     }
   }
   $('.message-from-list-btn').on("click", $.fn.addMessageData); 
-   $("#accordion").on('shown.bs.collapse', function () {
+   
+  $("#accordion").on('shown.bs.collapse', function () {
     var active = $("#accordion .in").attr('id');
     $.cookie('activeAccordionGroup', active);
           //  alert(active);
@@ -609,12 +619,14 @@ function listMessages(){
     $("#" + last).addClass("in");
   }
 }
-function updateMessages(){
 
-}
 $.fn.addMessageData = function(){
   var target = $(this).parent().find(".view-convo").data("target");
   var receiverId = target.slice(7, target.length);
+  
+  var currentDiv = $(target).selector;
+  
+
   $("#send-message-from-list-confirm").data('index', receiverId);
   $("#legendary").html("Send message to "+users.user[receiverId].userName+"");
   var offset = $(target).parent().offset().top;
@@ -622,6 +634,7 @@ $.fn.addMessageData = function(){
   var parentOffset = $("#messages").find(".content").offset().top;
   var relativeOffset = offset - parentOffset +9;
   $("#messages").find("fieldset").css("margin-top", ""+relativeOffset+"px");
+  resizeMessageInput(currentDiv);
 }
 
 $("#reg-name").keyup($.fn.valName);
@@ -638,3 +651,10 @@ $('#send-message-from-modal-confirm').on("click", $.fn.setModalMessageData);
 $('#send-message-from-list-confirm').on("click", $.fn.setListMessageData);
 
 
+function resizeMessageInput(currentDiv){
+  if (window.innerWidth < 992){
+    $("#messages").find(".message-form").prependTo(""+currentDiv +"");
+    $("#messages").find("fieldset").css("margin-top", "0px");
+
+  }
+}
