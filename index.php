@@ -308,7 +308,7 @@
     <div class="container">
       
       <div class="layer col-md-8"><!-- COLUMN-LEFT -->
-          <div id="info" class="page" data-menu-offset="-100">
+          <div id="posts" class="page" data-menu-offset="-100">
             <div class="well well-sm">
               <h3>Posts
                 <button title="new&nbsp;post" id="new-post-btn" class="btn btn-default btn-sm icon" data-toggle="collapse" data-target="#new-post"><span class="glyphicon glyphicon-plus"></span></button>
@@ -321,6 +321,11 @@
                 <fieldset>
                   <div class="form-group">
                     <div class="input-group post-input">
+                
+                      <span class="input-group-addon">Title</span>
+                      <input id="new-post-title" name="new-post-title" class="form-control" placeholder="" type="text" required="">
+                    </div>
+                    <div class="input-group post-input">          
                       <textarea id="new-post-form" name="message" class="form-control"></textarea>
                       <button id="new-post-confirm" type="button" class="btn btn-sm form-control">
                         Post
@@ -331,21 +336,21 @@
                 </form>
               </div>
               
-              <div class="col-md-12"><!-- COLUMN-LEFT -->
+             
               
               <div class="panel-group" id="post-accordion">
 
                   
             
-                </div>
+              </div>
 
-              </div><!-- / COLUMN-LEFT -->
+              
             </div>
           </div>
       </div><!-- / COLUMN-LEFT -->
       
       <div class="layer col-md-4"><!-- COLUMN-RIGHT -->
-        <div id="public-users" class="page" data-menu-offset="-100">
+        <div id="group-members" class="page" data-menu-offset="-100">
           <div class="well well-sm">
             <h3>Members</h3>
           </div>

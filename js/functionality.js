@@ -358,6 +358,8 @@ function loadGroupData(){
   var i = parseInt(localStorage.getItem("groupView"));
   var groupName = groups[i].groupName;
   $("#group").find("h2").html(groupName);
+  listPosts();
+  showMembers();
 }
 function showUsers(){
   $("#public-users").children().find("ul").empty();
@@ -712,6 +714,7 @@ function showPublicGroups(){
 
 }
 function showUserGroups(){
+  $("#group-list").empty();
   for (var i = 0; i < groups.length; i++){
     for (var j = 0; j < groups[i].members.length; j++){
       if (groups[i].members[j] == localStorage.loggedIn){
@@ -734,17 +737,27 @@ function leaveGroupView(){
   location.reload();
 
 }
+function showMembers(){
+ $("#member-list").empty();
+  $.each( groups[localStorage.groupView].members, function( key, value ) {
+    $("#member-list").append('<li><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[groups[localStorage.groupView].members[key]].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[groups[localStorage.groupView].members[key]].userName + '</button></div></li>');
+    $("#member-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">view profile</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li></ul>');
+  });
+  $('.dropdown-toggle').on("click", $.fn.addMessageDetails);
+}
 
 /**POSTING**/
 function newPost(){
   var memberId = localStorage.loggedIn;
   var groupId = localStorage.groupView;
+  var title = $("#new-post-title").val();
   var post = $("#new-post-form").val();
   var timestamp = Date.now();
 
   var tempObj =  {
     memberId : memberId, 
-    groupId : groupId, 
+    groupId : groupId,
+    title : title, 
     post : post,
     timestamp : timestamp
   }
@@ -753,10 +766,29 @@ function newPost(){
   localStorage.posts = JSON.stringify(posts);
   $("#new-post-form").val(''); 
   $("#new-post").removeClass("in");
-
-
+  loadGroupData();
 }
+function listPosts(){
+  $("#post-accordion").empty();
 
+  var thesePosts = [];
+  for (var i = 0; i < posts.length; i++){
+    if (posts[i].groupId == localStorage.groupView){
+      thesePosts.push(posts[i]);
+    }
+  }
+
+  var realArray = $.makeArray(thesePosts);    
+  function sortByTimestamp(a, b){
+    return a.timestamp - b.timestamp;
+  }
+  realArray.reverse();
+  for (var j = 0; j < realArray.length; j++){
+    $("#post-accordion").append('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">'+ realArray[j].title + '&nbsp;&nbsp;&nbsp;<span class="author">by '+users.user[realArray[j].memberId].userName+'</span><button type="button" title="view&nbsp;post" class="btn btn-default btn-sm icon-two view-post" data-toggle="collapse" data-target="#post-'+ j +'" data-parent="#post-accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
+    $("#post-accordion").find(".panel-default:last-child").append('<div id="post-'+ j +'" class="panel-collapse collapse post"><div class="panel-body"></div></div>');
+    $("#post-"+ j +"").append('<div class="post-body">' + realArray[j].post + '</div>');
+  }  
+}
 
 /**HANDLERS - duh! **/
 

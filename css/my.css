@@ -411,3 +411,27 @@ h3.group-item > .tooltip.top .tooltip-arrow {
 .post-input > textarea{
   height: 100px;
 }
+.post-body{
+  margin-top: -30px;
+  padding-top: 10px;
+  padding-left: 15px;
+  padding-bottom: 20px;
+  padding-right: 15px;
+  background-color: #9BE4FF;
+}
+.post{
+  background-color: #9BE4FF;
+}
+.author{
+  font-size: 80%;
+  color: gray;
+}
+#member-list{
+  list-style: none;
+  padding-top: 35px;
+  padding-bottom: 35px;
+
+}
+#member-list > li{
+  margin-left: -20px;
+}
