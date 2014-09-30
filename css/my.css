@@ -452,3 +452,12 @@ h3.group-item > .tooltip.top .tooltip-arrow {
   padding-right: 5px;
   margin-left: -15px;
 }
+#admin-all-users{
+  list-style: none;
+  padding-top: 15px;
+  padding-bottom: 35px;
+
+}
+#admin-all-users > li{
+  margin-left: -20px;
+}

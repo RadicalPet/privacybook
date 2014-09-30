@@ -121,19 +121,30 @@ $( document ).ready(function() {
     $(".logged-in").show();
     $(".logged-out").hide();
     $(".group-view").hide();
+    $(".admin").hide();
     $("#bg1, #bg2, #bg3").css("background", "url(img/underwater4.png)repeat 0 0");
     _.throttle(loadProfileData(), 100);
   }
   else if (parseInt(localStorage.groupView) > -1){
     $(".logged-in").hide();
     $(".logged-out").hide();
+    $(".admin").hide();
     $(".group-view").show();
     $("#bg1, #bg2, #bg3").css("background", "url(img/rainbow.png)repeat 0 0");
     _.throttle(loadGroupData(), 100);
   }
+  else if ((parseInt(localStorage.admin) > -1)){
+    $(".logged-in").hide();
+    $(".logged-out").hide();
+    $(".admin").show();
+    $(".group-view").hide();
+    $("#bg1, #bg2, #bg3").css("background", "none");
+    _.throttle(loadAdminData(), 100);
+  }
   else{
     $(".logged-in").hide();
     $(".logged-out").show();
+    $(".admin").hide();
     $(".group-view").hide();
   }
 
@@ -303,20 +314,30 @@ function login(){
   var password = $("#user-password").val();
 
   var registeredUser = -1;
-
+  var isAdmin = -1;
 
   for (var i = 0; i < users.user.length; i++){
+
     if (name == users.user[i].userName){
       registeredUser = i;
       $("#user-name").closest('.form-group').removeClass("has-error");
       $("#user-name").closest('.form-group').addClass("has-success");
     }
     else {
-      if (i == users.user.length && registeredUser == -1)
-      
+
+      if (i == users.user.length - 1 && registeredUser == -1){
         $("#user-name").closest('.form-group').removeClass("has-success");
         $("#user-name").closest('.form-group').addClass("has-error");
-    
+        
+        for (var j = 0; j < users.admin.length; j++){
+
+          if (name == users.admin[j].adminName){
+            isAdmin = j;
+            $("#user-name").closest('.form-group').removeClass("has-error");
+            $("#user-name").closest('.form-group').addClass("has-success");
+          }
+        }
+      }
     }
   }
   if (registeredUser > -1){      
@@ -333,11 +354,26 @@ function login(){
       $("#user-password").closest('.form-group').addClass("has-error");
     }
   }
+  else if(isAdmin > -1){
+     if (password == sjcl.decrypt("password", users.admin[isAdmin].password)){
+      localStorage.setItem("admin", isAdmin);
+
+      $('#log-in-modal').modal('hide');
+      $('.admin').show();
+      $('.logged-out').hide(); 
+    }
+    else{
+      $("#user-name").closest('.form-group').removeClass("has-error");
+      $("#user-password").closest('.form-group').addClass("has-error");
+    }
+  }
 }
 function logout(){
   localStorage.setItem("loggedIn", -1);
+  localStorage.setItem("admin", -1);
   $('#log-out-modal').modal('hide');
   $('.logged-in').hide();
+  $('.admin').hide();
   $('.logged-out').show(); 
 }
 
@@ -360,6 +396,10 @@ function loadGroupData(){
   $("#group").find("h2").html(groupName);
   listPosts();
   showMembers();
+  listUserPosts();
+}
+function loadAdminData(){
+  listUsersAdmin();
 }
 function showUsers(){
   $("#public-users").children().find("ul").empty();
@@ -830,6 +870,63 @@ function listPosts(){
 
   }  
 }
+function listUserPosts(){
+  $("#own-post-accordion").empty();
+
+  var thesePosts = [];
+  var theseReplies = [];
+  for (var i = 0; i < posts.length; i++){
+    if (posts[i].groupId == localStorage.groupView && posts[i].memberId == localStorage.loggedIn){
+      posts[i] = $.extend(posts[i], {postId : i});
+      thesePosts.push(posts[i]);
+      if (posts[i].replies){
+        for (var j = 0; j < posts[i].replies.length; j++ ){
+          theseReplies.push(posts[i].replies[j]);
+        }
+      }
+    }
+  }
+
+  var realArray = $.makeArray(thesePosts);    
+  function sortByTimestamp(a, b){
+    return a.timestamp - b.timestamp;
+  }
+  realArray.reverse();
+  for (var j = 0; j < realArray.length; j++){
+    $("#own-post-accordion").append('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">'+ realArray[j].title + '<button type="button" title="delete" class="btn btn-default btn-sm icon-two delete-post" data-toggle="modal" data-target="#delete-post-modal" data-index="'+realArray[j].postId+'"><span class="glyphicon glyphicon-remove"></button><button type="button" title="view&nbsp;post" class="btn btn-default btn-sm icon-two view-post" data-toggle="collapse" data-target="#own-post-'+ realArray[j].postId +'" data-parent="#post-accordion"><span class="glyphicon glyphicon-eye-open"></button></h3></div></div>');
+    $("#own-post-accordion").find(".panel-default:last-child").append('<div id="own-post-'+ realArray[j].postId +'" class="panel-collapse collapse post"><div class="panel-body"></div></div>');  
+    $("#own-post-"+ realArray[j].postId +"").append('<div class="post-body">' + realArray[j].post + '</div>');
+    $("#own-post-"+ realArray[j].postId +"").append('<div id="own-reply-to-'+realArray[j].postId+'" class="collapse"><textarea name="message" class="form-control"></textarea><button type="button" class="reply-confirm btn btn-sm form-control">Reply</button></div>');
+    $('.reply-confirm').on("click", $.fn.newReply);
+    for (var k = 0; k < theseReplies.length; k++){
+      if (theseReplies[k].postId == realArray[j].postId){
+        $("#own-post-"+ realArray[j].postId +"").append('<div class="reply-body"><span class="reply-username">'+users.user[theseReplies[k].memberId].userName+':</span>&nbsp;&nbsp;&nbsp;'+ theseReplies[k].reply + '</div>');
+      }
+    }
+  }
+  $(".delete-post").on("click", $.fn.addPostDeleteData);
+}
+$.fn.addPostDeleteData = function(){
+  $("#delete-post-modal").find(".modal-body").html(posts[$(this).data("index")].title);
+  $('#delete-post-confirm').data("index", $(this).data("index"));
+}
+$.fn.deletePost = function(){
+  var postId = $(this).data("index");
+  posts.splice(postId, 1);
+  localStorage.posts = JSON.stringify(posts); 
+  $('#delete-post-modal').modal('hide');
+  loadGroupData();  
+}
+
+/**ADMIN**/
+function listUsersAdmin(){
+  $("#admin-all-users").empty();
+  $.each( users.user, function( key, value ) {
+    $("#admin-all-users").append('<li class="col-xs-4"><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[key].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[key].userName + '</button></div></li>');
+    $("#admin-all-users").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">view user data</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li><li><a href="#" data-toggle="modal" data-target="#block-user-modal">block user</a></li><li><a href="#" data-toggle="modal" data-target="#delete-user-modal">delete user</a></li></ul>');
+  });
+  $('.dropdown-toggle').on("click", $.fn.sendAdminMessage);
+}
 
 /**HANDLERS - duh! **/
 
@@ -847,3 +944,4 @@ $('.back-to-profile-btn').on("click", leaveGroupView);
 $('#send-message-from-modal-confirm').on("click", $.fn.setModalMessageData);
 $('#send-message-from-list-confirm').on("click", $.fn.setListMessageData);
 $('#new-post-confirm').on("click", newPost);
+$('#delete-post-confirm').on("click", $.fn.deletePost);

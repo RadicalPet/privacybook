@@ -128,7 +128,43 @@
         </ul>  
       </div>
     </div>
-  <!-- //GROUP VIEW -->  
+  <!-- //GROUP VIEW -->
+  <!-- ADMIN -->
+    <div class="container admin"> 
+      <div class="navbar-header"></div>
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="active">
+            <a href="#admin">Admin Area</a>
+          </li>
+          <li>
+            <a href="#users">All Users</a>
+          </li>
+          <li>
+            <a href="#group-activity">Group Activity</a>
+          </li>
+          <li>
+            <a href="#new-admin">Add Admin</a>
+          </li>                      
+        </ul>
+        <ul class="admin nav pull-right">
+          <li>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-default btn-login" data-toggle="modal" data-target="#log-out-modal">
+                Log Out
+              </button>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  <!-- // ADMIN -->   
   </div>
 <!-- MAIN NAVBAR-->  
 
@@ -345,9 +381,64 @@
         </div><!-- /COLUMN-RIGHT -->  
       </div>
     </div><!-- /ROW-->
+
+<!-- ***YOUR POSTS*** -->
+
+    <div class="row"><!-- ROW -->
+      <div class="container">
+        <div class="layer col-md-12"><!-- COLUMN WIDE -->
+          <div id="something" class="page" data-menu-offset="-100">
+            <div class="well well-sm">
+              <h3>
+                Your Posts
+              </h3>
+            </div>     
+            <div class="content">
+            <div class="panel-group" id="own-post-accordion">
+                <!-- CONTENT DYNAMIC -->
+              </div>
+            </div>
+          </div>
+        </div><!-- /COLUMN WIDE -->  
+      </div>
+    </div><!-- /ROW-->
   
   </div>
 <!-- /GROUP VIEW -->
+<!-- ADMIN -->
+  <div class="admin">
+    
+    <div class="row"><!-- ROW -->
+      <div class="container">
+        <div class="layer col-md-12"><!-- COLUMN WIDE -->
+          <div id="home" class="page" data-menu-offset="-100">
+            <div class="well well-lg" data-0="background: rgba(0,0,0,0.25);" data-100="background: rgba(0,0,0,0);" >
+              <h2 data-0="opacity:1" data-100="opacity: 0">Admin Area</h2>
+            </div>
+          </div> 
+        </div><!-- /COLUMN WIDE -->
+      </div>
+    </div><!-- /ROW -->
+
+    <div class="row"><!-- ROW -->
+      <div class="container">
+        <div class="layer col-md-12"><!-- COLUMN WIDE -->
+          <div id="users" class="page" data-menu-offset="-100">
+            <div class="well well-sm">
+              <h3>All Users</h3>
+            </div>
+            <div class="content">
+              <ul id="admin-all-users">
+                <!-- DYNAMIC CONTENT-->
+              </ul>
+            </div>
+          </div>
+        </div><!-- /COLUMN WIDE -->
+      </div>
+    </div><!-- /ROW -->
+
+  </div>
+<!-- /ADMIN -->
 <!-- // ROW COLUMN BULLSHIT -->
 
 <!-- BACKGROUNDS -->
@@ -584,6 +675,33 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Modal DELETE POST-->
+  <div class="modal fade" id="delete-post-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            &times;
+          </button>
+          <h4 class="modal-title" id="log-out-label">
+            Do you really want to delete
+          </h4>
+        </div>
+        <div class="modal-body">
+          <!-- CONTENT DYNAMIC -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Nope
+          </button>
+          <button id="delete-post-confirm" type="button" class="btn btn-primary">
+            Yes
+          </button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
   </div>
 
 <!-- SCRIPTS -->
