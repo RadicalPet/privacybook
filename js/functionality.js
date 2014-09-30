@@ -639,8 +639,6 @@ $.fn.setListMessageData = function(){
   var message = $("#message-in-list").val();
   var timestamp = Date.now();
 
-
-
   $.fn.sendMessage(senderId, receiverId, message, timestamp);
   $("#message-in-list").val('');
   listMessages();
@@ -768,13 +766,48 @@ function newPost(){
   $("#new-post").removeClass("in");
   loadGroupData();
 }
+$.fn.newReply = function(){
+  var postId = $(this).parent()[0].id;
+  postId = postId.slice(9, postId.length);
+  var reply = $(this).parent().find("textarea").val();
+  var memberId = localStorage.loggedIn;
+  var timestamp = Date.now();
+
+  var tempObj =  {
+    postId : postId, 
+    memberId : memberId, 
+    reply : reply,
+    timestamp : timestamp
+  }
+  if (posts[postId].replies){
+    if (tempObj.reply != ""){
+      posts[postId].replies.push(tempObj);
+    }
+  }
+  else{
+    if (tempObj.reply != ""){
+      posts[postId] = $.extend(posts[postId], {replies : [tempObj]});
+    }
+  }
+  localStorage.posts = JSON.stringify(posts);
+  $(this).parent().find("textarea").val(''); 
+  $(this).parent().removeClass("in");
+  loadGroupData();
+}
 function listPosts(){
   $("#post-accordion").empty();
 
   var thesePosts = [];
+  var theseReplies = [];
   for (var i = 0; i < posts.length; i++){
     if (posts[i].groupId == localStorage.groupView){
+      posts[i] = $.extend(posts[i], {postId : i});
       thesePosts.push(posts[i]);
+      if (posts[i].replies){
+        for (var j = 0; j < posts[i].replies.length; j++ ){
+          theseReplies.push(posts[i].replies[j]);
+        }
+      }
     }
   }
 
@@ -784,9 +817,17 @@ function listPosts(){
   }
   realArray.reverse();
   for (var j = 0; j < realArray.length; j++){
-    $("#post-accordion").append('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">'+ realArray[j].title + '&nbsp;&nbsp;&nbsp;<span class="author">by '+users.user[realArray[j].memberId].userName+'</span><button type="button" title="view&nbsp;post" class="btn btn-default btn-sm icon-two view-post" data-toggle="collapse" data-target="#post-'+ j +'" data-parent="#post-accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
-    $("#post-accordion").find(".panel-default:last-child").append('<div id="post-'+ j +'" class="panel-collapse collapse post"><div class="panel-body"></div></div>');
-    $("#post-"+ j +"").append('<div class="post-body">' + realArray[j].post + '</div>');
+    $("#post-accordion").append('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">'+ realArray[j].title + '&nbsp;&nbsp;&nbsp;<span class="author">by '+users.user[realArray[j].memberId].userName+'</span><button type="button" title="reply" class="btn btn-default btn-sm icon-two view-post" data-toggle="collapse" data-target="#reply-to-'+realArray[j].postId+'" ><span class="glyphicon glyphicon-share-alt"></button><button type="button" title="view&nbsp;post" class="btn btn-default btn-sm icon-two view-post" data-toggle="collapse" data-target="#post-'+ realArray[j].postId +'" data-parent="#post-accordion"><span class="glyphicon glyphicon-eye-open"></button></h3></div></div>');
+    $("#post-accordion").find(".panel-default:last-child").append('<div id="post-'+ realArray[j].postId +'" class="panel-collapse collapse post"><div class="panel-body"></div></div>');  
+    $("#post-"+ realArray[j].postId +"").append('<div class="post-body">' + realArray[j].post + '</div>');
+    $("#post-"+ realArray[j].postId +"").append('<div id="reply-to-'+realArray[j].postId+'" class="collapse"><textarea name="message" class="form-control"></textarea><button type="button" class="reply-confirm btn btn-sm form-control">Reply</button></div>');
+    $('.reply-confirm').on("click", $.fn.newReply);
+     for (var k = 0; k < theseReplies.length; k++){
+      if (theseReplies[k].postId == realArray[j].postId){
+        $("#post-"+ realArray[j].postId +"").append('<div class="reply-body"><span class="reply-username">'+users.user[theseReplies[k].memberId].userName+':</span>&nbsp;&nbsp;&nbsp;'+ theseReplies[k].reply + '</div>');
+      }
+    }
+
   }  
 }
 

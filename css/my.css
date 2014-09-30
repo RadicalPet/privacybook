@@ -4,7 +4,7 @@ html, body
   font-family: Orbitron, sans-serif;
   height: 100%;
   width: 99%;
-  background-color: black;
+  background-color: #68D6FF;
 }
 h2{
   color: black;
@@ -434,4 +434,21 @@ h3.group-item > .tooltip.top .tooltip-arrow {
 }
 #member-list > li{
   margin-left: -20px;
+}
+.reply-body{
+  padding-top: 10px;
+  margin-left: 35px;
+  padding-bottom: 10px;
+  padding-right: 15px;
+  padding-left: 15px;
+  background-color: #D1F1FC;
+  border-top: solid rgba(0,0,0,0.3) 1px;
+  word-wrap: break-word;
+}
+.reply-username{
+  color: #006C7C;
+  padding-top: 13px;
+  padding-left: 15px;
+  padding-right: 5px;
+  margin-left: -15px;
 }
