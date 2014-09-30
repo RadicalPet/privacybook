@@ -56,8 +56,10 @@
           
       </div><!--/.nav-collapse -->
     
-    </div><!--/.logged-out -->
-    <div class="container logged-out"> <!--.logged-in -->
+    </div><!--/.logged-in -->
+
+
+    <div class="container logged-out"> <!--.logged-out -->
       <div class="navbar-header"></div>
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
          <span class="sr-only">Toggle navigation</span>
@@ -88,8 +90,48 @@
          </ul>
           
       </div><!--/.nav-collapse -->
-    </div><!--/.logged-out -->  
-  </div>
+    </div><!--/.logged-out --> 
+
+     <div class="container group-view"> <!--.group-view -->
+      <div class="navbar-header"></div>
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+         <span class="sr-only">Toggle navigation</span>
+         <span class="icon-bar"></span>
+         <span class="icon-bar"></span>
+         <span class="icon-bar"></span>
+       </button>
+      <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#group">Group</a>
+           </li>
+           <li><a href="#posts">Posts</a>
+           </li>
+           <li><a href="#something">Your Posts</a>
+           </li>           
+         </ul>
+         <ul class="group-view nav pull-right">
+          <li>
+            <div class="btn-group btn-group-sm">
+              <button type="button" class="btn btn-default btn-login back-to-profile-btn">
+                Back to Profile
+              </button>
+              <!--
+              <button type="button" class="btn btn-default btn-register" data-toggle="modal" data-target="#register-modal">
+                Register
+              </button>-->
+            </div>
+          </li>
+         </ul>
+          
+      </div><!--/.nav-collapse -->
+    </div><!--/.group-view-->  
+  
+  </div>  
+
+
+
+
+
 
 <!-- ROW / COLUMN BULLSHIT -->
 <div class="logged-in"><!-- LOGGED IN -->
@@ -150,8 +192,8 @@
             <h3>Your Groups</h3>
           </div>
           <div class="content">
-            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            <ul id="group-list">
+            </ul>
           </div>
         </div>
       </div><!-- / COLUMN-LEFT -->
@@ -163,7 +205,8 @@
             <h3>Public Groups</h3>
           </div>
           <div class="content">
-            <br><br><br><br><br><br><br><br><br><br>
+            <ul id="public-group-list">
+            </ul>
           </div>
         </div>
 
@@ -241,6 +284,83 @@
   </div><!-- /.row -->
 </div><!-- /#logged-in-->
 
+
+
+
+<div class="group-view"><!-- Group View -->
+  <div class="row"><!-- ROW -->
+    <div class="container">
+      <div class="layer col-md-12"><!-- COLUMN-LEFT -->
+        
+        <div id="group" class="page" data-menu-offset="-100">
+          <div class="well well-lg" data-0="background: rgba(0,0,0,0.25);" data-100="background: rgba(0,0,0,0);" >
+            <h2 data-0="opacity:1" data-100="opacity: 0">Group Page</h2>
+         </div>
+        </div> 
+       
+      </div><!-- / COLUMN-LEFT -->
+      
+    </div><!-- /.container -->
+  </div><!-- /.row -->
+
+
+ <div class="row"><!-- ROW -->
+    <div class="container">
+      
+      <div class="layer col-md-8"><!-- COLUMN-LEFT -->
+          <div id="info" class="page" data-menu-offset="-100">
+            <div class="well well-sm">
+              <h3>Posts
+                <button title="new&nbsp;post" id="new-post-btn" class="btn btn-default btn-sm icon" data-toggle="collapse" data-target="#new-post"><span class="glyphicon glyphicon-plus"></span></button>
+                <!--<button id="show-edit-info" title="edit personal info" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-pencil"></span></button>-->
+              </h3>
+            </div>     
+            <div class="content">
+              <div id="new-post" class="collapse">
+                <form class="form-horizontal">
+                <fieldset>
+                  <div class="form-group">
+                    <div class="input-group post-input">
+                      <textarea id="new-post-form" name="message" class="form-control"></textarea>
+                      <button id="new-post-confirm" type="button" class="btn btn-sm form-control">
+                        Post
+                      </button>
+                    </div>
+                  </div>
+                </fieldset>
+                </form>
+              </div>
+              
+              <div class="col-md-12"><!-- COLUMN-LEFT -->
+              
+              <div class="panel-group" id="post-accordion">
+
+                  
+            
+                </div>
+
+              </div><!-- / COLUMN-LEFT -->
+            </div>
+          </div>
+      </div><!-- / COLUMN-LEFT -->
+      
+      <div class="layer col-md-4"><!-- COLUMN-RIGHT -->
+        <div id="public-users" class="page" data-menu-offset="-100">
+          <div class="well well-sm">
+            <h3>Members</h3>
+          </div>
+          <div class="content">
+           <ul id="member-list">
+             
+           </ul>
+          </div>
+        </div>
+
+      </div><!-- /COLUMN-RIGHT -->  
+    </div><!-- /.container -->
+  </div><!-- /.row -->
+
+</div><!-- //Group View -->
 
 
 

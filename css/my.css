@@ -372,3 +372,42 @@ h3 > .tooltip.top .tooltip-arrow {
   margin-left: 10px;
   width: 93%;
 }
+h3.group-item{
+  font-size: 120%;
+  width: 100%;
+  padding: 5px;
+  border: solid 2px rgba(0,0,0,0.3);
+  margin-left: -20px;
+
+}
+h3.group-item > .tooltip > .tooltip-inner {
+  background-color: #fff;
+  color: #000;
+}
+h3.group-item > .tooltip.top .tooltip-arrow {
+  border-top-color: #fff;
+}
+#public-group-list{
+  list-style: none;
+  padding-top: 35px;
+  padding-bottom: 35px;
+
+}
+#public-group-list > li{
+  margin-left: -20px;
+}
+.back-to-profile-btn{
+  width: 120px;
+  margin-right: 38px;
+}
+.post-input{
+  width: 95%;
+  border: solid white 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  margin: 5px auto;
+}
+.post-input > textarea{
+  height: 100px;
+}

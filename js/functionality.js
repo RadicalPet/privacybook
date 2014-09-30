@@ -117,14 +117,24 @@
 }));
 
 $( document ).ready(function() {
-  if (parseInt(localStorage.loggedIn) > -1){
+  if (parseInt(localStorage.loggedIn) > -1 && (parseInt(localStorage.groupView) < 0)){
     $(".logged-in").show();
     $(".logged-out").hide();
+    $(".group-view").hide();
+    $("#bg1, #bg2, #bg3").css("background", "url(img/underwater4.png)repeat 0 0");
     _.throttle(loadProfileData(), 100);
+  }
+  else if (parseInt(localStorage.groupView) > -1){
+    $(".logged-in").hide();
+    $(".logged-out").hide();
+    $(".group-view").show();
+    $("#bg1, #bg2, #bg3").css("background", "url(img/rainbow.png)repeat 0 0");
+    _.throttle(loadGroupData(), 100);
   }
   else{
     $(".logged-in").hide();
     $(".logged-out").show();
+    $(".group-view").hide();
   }
 
 /**TOOLTIP**/  
@@ -331,8 +341,6 @@ function logout(){
   $('.logged-out').show(); 
 }
 
-
-
 /**DISPLAY STUFF**/
 
 function loadProfileData(){
@@ -343,6 +351,13 @@ function loadProfileData(){
   showUsers();
   showInfo();
   listMessages();
+  showUserGroups();
+  showPublicGroups();
+}
+function loadGroupData(){
+  var i = parseInt(localStorage.getItem("groupView"));
+  var groupName = groups[i].groupName;
+  $("#group").find("h2").html(groupName);
 }
 function showUsers(){
   $("#public-users").children().find("ul").empty();
@@ -385,7 +400,7 @@ function listMessages(){
     if (users.user[localStorage.loggedIn][i] && i != localStorage.loggedIn){
       
       //create panel for this sender of the messages
-      $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title">'+ users.user[i].userName + '<button type="button" title="send&nbsp;message" class="message-from-list-btn btn btn-default btn-sm icon-two" data-toggle="collapse" data-target="#send-message-from-list"><span class="glyphicon glyphicon-send"></span></button><button type="button" title="view&nbsp;conversation" class="btn btn-default btn-sm icon-two view-convo" data-toggle="collapse" data-target="#convo-'+ i +'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
+      $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">'+ users.user[i].userName + '<button type="button" title="send&nbsp;message" class="message-from-list-btn btn btn-default btn-sm icon-two" data-toggle="collapse" data-target="#send-message-from-list"><span class="glyphicon glyphicon-send"></span></button><button type="button" title="view&nbsp;conversation" class="btn btn-default btn-sm icon-two view-convo" data-toggle="collapse" data-target="#convo-'+ i +'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
       $("#accordion").find(".panel-default:last-child").append('<div id="convo-'+ i +'" class="panel-collapse collapse convo"><div class="panel-body"></div></div>');
       
       //create empty arrray for the messages
@@ -682,6 +697,65 @@ function resizeMessageInput(currentDiv){
   }
 }
 
+/**GROUPS**/
+function startNewGroup(){
+  
+}
+function joinGroup(){
+
+}
+function showPublicGroups(){
+  for (var i = 0; i < groups.length; i++){
+    $("#public-group-list").append('<li><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+ i +'" data-user="'+ groups[i].groupName +'" data-toggle="dropdown"><span class="caret"></span> ' + groups[i].groupName + '</button></div></li>');
+    $("#public-group-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">join&nbsp;group</a></li></ul>');
+  }
+
+}
+function showUserGroups(){
+  for (var i = 0; i < groups.length; i++){
+    for (var j = 0; j < groups[i].members.length; j++){
+      if (groups[i].members[j] == localStorage.loggedIn){
+        $("#group-list").append('<h3 class="group-item">'+ groups[i].groupName + '<button type="button" title="leave&nbsp;group" class="leave-group-btn btn btn-default btn-sm icon-two"><span class="glyphicon glyphicon-remove"></span></button><button type="button" title="view&nbsp;group" class="btn view-group-btn btn-default btn-sm icon-two" data-index="'+i+'"><span class="glyphicon glyphicon-eye-open"></h3>');       
+        
+      }
+    }
+  }
+  $('.view-group-btn').on("click", $.fn.viewGroup);
+}
+
+$.fn.viewGroup = function(){
+  localStorage.setItem("groupView", $(this).data("index"));
+  window.scrollTo(0, 0);
+  location.reload();
+}
+function leaveGroupView(){
+  localStorage.setItem("groupView", "-1");
+  window.scrollTo(0, 0);
+  location.reload();
+
+}
+
+/**POSTING**/
+function newPost(){
+  var memberId = localStorage.loggedIn;
+  var groupId = localStorage.groupView;
+  var post = $("#new-post-form").val();
+  var timestamp = Date.now();
+
+  var tempObj =  {
+    memberId : memberId, 
+    groupId : groupId, 
+    post : post,
+    timestamp : timestamp
+  }
+
+  posts.push(tempObj);
+  localStorage.posts = JSON.stringify(posts);
+  $("#new-post-form").val(''); 
+  $("#new-post").removeClass("in");
+
+
+}
 
 
 /**HANDLERS - duh! **/
@@ -696,7 +770,7 @@ $('#log-out-confirm').on("click", logout);
 $('#add-info-btn').on("click", addInfoForm);
 $('#add-info-confirm').on("click", addInfo);
 $('#show-edit-info').on("click", showEditInfo);
+$('.back-to-profile-btn').on("click", leaveGroupView);
 $('#send-message-from-modal-confirm').on("click", $.fn.setModalMessageData);
 $('#send-message-from-list-confirm').on("click", $.fn.setListMessageData);
-
-
+$('#new-post-confirm').on("click", newPost);
