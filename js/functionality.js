@@ -117,7 +117,7 @@
 }));
 
 $( document ).ready(function() {
-  if (parseInt(localStorage.loggedIn) > -1 && (parseInt(localStorage.groupView) < 0)){
+  if (parseInt(localStorage.loggedIn) > -1 && (parseInt(localStorage.groupView) < 0 || !localStorage.groupView)){
     $(".logged-in").show();
     $(".logged-out").hide();
     $(".group-view").hide();
@@ -299,7 +299,9 @@ function register(){
       {
         userName: name, 
         email : email, 
-        password : passwordCrypt
+        password : passwordCrypt,
+        blocked : false,
+        deleted : false
       }
     );
     localStorage.users = JSON.stringify(users);
@@ -324,7 +326,7 @@ function login(){
 
   for (var i = 0; i < users.user.length; i++){
 
-    if (name == users.user[i].userName){
+    if (name == users.user[i].userName && users.user[i].deleted == false){
       registeredUser = i;
       $("#user-name").closest('.form-group').removeClass("has-error");
       $("#user-name").closest('.form-group').addClass("has-success");
@@ -351,6 +353,9 @@ function login(){
       localStorage.setItem("loggedIn", registeredUser);
 
       loadProfileData();
+      if (users.user[registeredUser].blocked == true){
+         alert("You have been blocked! Check your messages for the reason!");
+      }
       $('#log-in-modal').modal('hide');
       $('.logged-in').show();
       $('.logged-out').hide(); 
@@ -368,6 +373,8 @@ function login(){
       $('.admin').show();
       $('.logged-out').hide(); 
        _.throttle(loadAdminData(), 100);
+       location.reload();
+
     }
     else{
       $("#user-name").closest('.form-group').removeClass("has-error");
@@ -393,6 +400,9 @@ function loadProfileData(){
   var thisUser = users.user[localStorage.loggedIn];
   var userName = users.user[i].userName;
   $("#home").find("h2").html(userName);
+  if (thisUser.blocked == true){
+    $("#home").find("h2").append("<span class='blocked'>&nbsp;&nbsp;&nbsp;(BLOCKED! If you want to appeal the block write an email to admin@privacybook.net)</span>");
+  }
   showUsers();
   showInfo(thisUser);
   listMessages();
@@ -409,6 +419,7 @@ function loadGroupData(){
 }
 function loadAdminData(){
   listUsersAdmin();
+
 }
 function showUsers(){
   $("#public-users").children().find("ul").empty();
@@ -676,8 +687,14 @@ $.fn.addMessageData = function(){
   resizeMessageInput(currentDiv);
 }
 $.fn.setModalMessageData = function(){
-  var senderId = localStorage.loggedIn;
+  if (localStorage.loggedIn > -1){
+    var senderId = localStorage.loggedIn;
+  }
+  if (localStorage.admin > -1){
+    var senderId = "admin";
+  }
   var receiverId = $(this).data("index");
+  console.log(receiverId);
   var message = $("#message-in-modal").val();
   var timestamp = Date.now();
 
@@ -696,49 +713,55 @@ $.fn.setListMessageData = function(){
   listMessages();
 }
 $.fn.sendMessage = function(senderId, receiverId, message, timestamp){
- 
-  if (!users.user[parseInt(receiverId)][senderId]){
-
-    var tempObj =  {};
-    tempObj[senderId] = [{  
-      message : message,
-      timestamp : timestamp
-    }];
+  if (message != "" && users.user[senderId].blocked == false){
+    if (!users.user[parseInt(receiverId)][senderId]){
+      var tempObj =  {};
     
-    users.user[parseInt(receiverId)] = $.extend(users.user[parseInt(receiverId)], tempObj);
-    localStorage.users = JSON.stringify(users); 
+      tempObj[senderId] = [{  
+        message : message,
+        timestamp : timestamp
+      }];
+    
+      users.user[parseInt(receiverId)] = $.extend(users.user[parseInt(receiverId)], tempObj);
+      localStorage.users = JSON.stringify(users); 
    
-  }
-  else{
-
-    var tempObj = {
-      message: message, 
-      timestamp : timestamp
     }
-    users.user[parseInt(receiverId)][senderId].push(tempObj);
-   
-  }
-  if (!users.user[senderId][senderId]){
-    
-    var tempObj =  {};
-    tempObj[senderId] = [{  
-      message : message,
-      timestamp : timestamp,
-      receiverId : receiverId
-    }];
-    
-    users.user[senderId] = $.extend(users.user[senderId], tempObj);
+    else{
+
+      var tempObj = {
+        message: message, 
+        timestamp : timestamp
+      }
+      users.user[parseInt(receiverId)][senderId].push(tempObj);
+    }
+    if (localStorage.loggedIn > -1){
+      if (!users.user[senderId][senderId]){
+      
+        var tempObj =  {};
+          tempObj[senderId] = [{  
+          message : message,
+          timestamp : timestamp,
+          receiverId : receiverId
+        }];
+      
+        users.user[senderId] = $.extend(users.user[senderId], tempObj);
+        localStorage.users = JSON.stringify(users); 
+      }
+      else{
+        var tempObj = {
+          message: message, 
+          timestamp : timestamp,
+          receiverId : receiverId
+        }
+      }
+      users.user[senderId][senderId].push(tempObj);
+
+    }
     localStorage.users = JSON.stringify(users); 
   }
-  else{
-    var tempObj = {
-      message: message, 
-      timestamp : timestamp,
-      receiverId : receiverId
-    }
-    users.user[senderId][senderId].push(tempObj);
+  if (users.user[senderId].blocked == true){
+    alert("You can not send messages!");
   }
-  localStorage.users = JSON.stringify(users); 
   $('#send-message-modal').modal('hide');
 }
 function resizeMessageInput(currentDiv){
@@ -937,6 +960,7 @@ $.fn.deletePost = function(){
 
 /**ADMIN**/
 function listUsersAdmin(){
+  
   $("#admin-all-users").empty();
   $.each( users.user, function( key, value ) {
     $("#admin-all-users").append('<li class="col-xs-4"><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[key].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[key].userName + '</button></div></li>');
@@ -948,10 +972,13 @@ $.fn.viewUserAdmin = function(key){
   $("#admin-all-users").hide();
   $("#edit-info-form").remove();
   showInfo(users.user[key]);
-  $("#users").find("h3").html(''+users.user[key].userName+'<button title="edit user" id="edit-user-admin" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-pencil"></span></button><button title="list&nbsp;all&nbsp;posts" id="list-all-posts-admin" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-list"></span></button><button title="send&nbsp;message" id="send-message-admin" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-envelope"></span></button><button title="block&nbsp;user" id="block-user" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-ban-circle"></span></button><button title="remove&nbsp;user" id="remove-user" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-remove"></span></button>');
+  $("#users").find("h3").html('<button title="go&nbsp;back" id="back" class="btn btn-default btn-sm icon-three" onclick="leaveView()"><span class="glyphicon glyphicon-arrow-left"></span></button>&nbsp;&nbsp;&nbsp;'+users.user[key].userName+'<button title="edit user" id="edit-user-admin" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-pencil"></span></button><button title="list&nbsp;all&nbsp;posts" id="list-all-posts-admin" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-list"></span></button><button title="send&nbsp;message" id="send-message-admin" class="btn btn-default btn-sm icon" data-toggle="modal" data-target="#send-message-modal" data-user="'+users.user[key].userName+'" data-index="'+key+'"><span class="glyphicon glyphicon-envelope"></span></button><button title="block&nbsp;user" id="block-user" class="btn btn-default btn-sm icon" data-index="'+key+'"><span class="glyphicon glyphicon-ban-circle"></span></button><button title="delete&nbsp;user" id="delete-user" class="btn btn-default btn-sm icon" data-index="'+key+'"><span class="glyphicon glyphicon-remove"></span></button>');
   localStorage.setItem("viewing", key);
   $('#edit-user-admin').on("click", editUserAdmin);
   $('#list-all-posts-admin').on("click", listAllUserPosts);
+  $('#send-message-admin').on("click", $.fn.addMessageDetails);
+  $('#block-user').on("click", $.fn.blockUser);
+  $('#delete-user').on("click", $.fn.deleteUser);
 }
 function dismissEdit(){
   $("#edit-info-form").remove();
@@ -1000,6 +1027,7 @@ function submitEditedInfoAdmin(){
   $.fn.viewUserAdmin(localStorage.viewing);
 }
 function listAllUserPosts(){
+  $("#list-all-posts-admin").addClass("disabled");
   $("#user-posts-accordion").remove();
   $("#users").find(".content").append("<hr>");
   $("#users").find(".content").append('<div class="panel-group" id="user-posts-accordion">');
@@ -1022,6 +1050,27 @@ function listAllUserPosts(){
     $("#own-post-"+ realArray[j].postId +"").append('<div class="post-body">' + realArray[j].post + '</div>');
   }
   $('.delete-post').on("click", $.fn.addPostDeleteData);
+}
+function leaveView(){
+  localStorage.viewing = -1;
+  loadAdminData();
+  location.reload();
+}
+$.fn.blockUser = function(){
+  var i = $(this).data("index");
+  if (confirm('do you really want to block ' + users.user[i].userName + ' ?')){
+    users.user[i].blocked = true;
+    localStorage.users = JSON.stringify(users); 
+
+  }
+}
+$.fn.deleteUser = function(){
+  var i = $(this).data("index");
+  if (confirm('Do you really want to delete ' + users.user[i].userName + ' permanently?')){
+    users.user[i].deleted = true;
+    users.user[i].userName = "";
+    localStorage.users = JSON.stringify(users); 
+  }
 }
 /**HANDLERS - duh! **/
 

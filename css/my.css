@@ -461,3 +461,7 @@ h3.group-item > .tooltip.top .tooltip-arrow {
 #admin-all-users > li{
   margin-left: -20px;
 }
+.blocked{
+  font-size: 70%;
+  color: red;
+}
