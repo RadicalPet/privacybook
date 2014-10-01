@@ -1,3 +1,5 @@
+
+
 var users;
 var posts = [];
 
@@ -38,12 +40,16 @@ else{
     "user": [
       { "userName" : "Sarah", 
         "email" : "sahara.braun@gmail.com", 
-        "password" : "{\"iv\":\"J60o8sqG8sV1vmmm0otnGA\",\"v\":1,\"iter\":1000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"salt\":\"0CARliu/g7Y\",\"ct\":\"gaNMaWzPAZZ/nHn9rtSTOFOWONM\"}"
+        "password" : "{\"iv\":\"J60o8sqG8sV1vmmm0otnGA\",\"v\":1,\"iter\":1000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"salt\":\"0CARliu/g7Y\",\"ct\":\"gaNMaWzPAZZ/nHn9rtSTOFOWONM\"}",
+        "blocked" : false,
+        "deleted" : false
       },
       {
         "userName": "Holly", 
         "email" : "ominousomnivore@googlemail.com", 
-        "password" : "{\"iv\":\"J60o8sqG8sV1vmmm0otnGA\",\"v\":1,\"iter\":1000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"salt\":\"0CARliu/g7Y\",\"ct\":\"gaNMaWzPAZZ/nHn9rtSTOFOWONM\"}"
+        "password" : "{\"iv\":\"J60o8sqG8sV1vmmm0otnGA\",\"v\":1,\"iter\":1000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"salt\":\"0CARliu/g7Y\",\"ct\":\"gaNMaWzPAZZ/nHn9rtSTOFOWONM\"}",
+        "blocked" : false,
+        "deleted" : false  
       }
     ],
     "admin":[

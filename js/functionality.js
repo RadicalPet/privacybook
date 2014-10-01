@@ -139,7 +139,13 @@ $( document ).ready(function() {
     $(".admin").show();
     $(".group-view").hide();
     $("#bg1, #bg2, #bg3").css("background", "none");
-    _.throttle(loadAdminData(), 100);
+    if (localStorage.viewing > -1){
+      $.fn.viewUserAdmin(localStorage.viewing);
+    }
+    else{
+      _.throttle(loadAdminData(), 100);
+    }
+   
   }
   else{
     $(".logged-in").hide();
@@ -361,6 +367,7 @@ function login(){
       $('#log-in-modal').modal('hide');
       $('.admin').show();
       $('.logged-out').hide(); 
+       _.throttle(loadAdminData(), 100);
     }
     else{
       $("#user-name").closest('.form-group').removeClass("has-error");
@@ -371,6 +378,7 @@ function login(){
 function logout(){
   localStorage.setItem("loggedIn", -1);
   localStorage.setItem("admin", -1);
+  localStorage.setItem("viewing", -1);
   $('#log-out-modal').modal('hide');
   $('.logged-in').hide();
   $('.admin').hide();
@@ -382,10 +390,11 @@ function logout(){
 function loadProfileData(){
 
   var i = parseInt(localStorage.getItem("loggedIn"));
+  var thisUser = users.user[localStorage.loggedIn];
   var userName = users.user[i].userName;
   $("#home").find("h2").html(userName);
   showUsers();
-  showInfo();
+  showInfo(thisUser);
   listMessages();
   showUserGroups();
   showPublicGroups();
@@ -409,26 +418,28 @@ function showUsers(){
   });
   $('.dropdown-toggle').on("click", $.fn.addMessageDetails);
 }
-function showInfo(){
-  var thisUser = users.user[localStorage.loggedIn];
+function showInfo(thisUser){
+  
+  if (localStorage.loggedIn > -1){
     $("#show-edit-info").removeClass("disabled");
-  $("#info").find(".content").empty();
+    $(".info").find(".content").empty();
+  }
   if (thisUser.userLocation){
-    $("#info").find(".content").append('<h4>Location:</h4><div class="user-info" id="user-location">' + thisUser.userLocation + '</div>');  
+    $(".info").find(".content").append('<h4>Location:</h4><div class="user-info" id="user-location">' + thisUser.userLocation + '</div>');  
     
   }
   if (thisUser.about){
-    $("#info").find(".content").append('<h4>About me:</h4><div class="user-info" id="user-about">' + thisUser.about + '</div>');
+    $(".info").find(".content").append('<h4>About me:</h4><div class="user-info" id="user-about">' + thisUser.about + '</div>');
   }
   if (thisUser.interests){
-    $("#info").find(".content").append('<h4>Interests:</h4><div class="user-info" id="user-interests">' + thisUser.interests + '</div>');
+    $(".info").find(".content").append('<h4>Interests:</h4><div class="user-info" id="user-interests">' + thisUser.interests + '</div>');
   }
   if (thisUser.tagList){
-    $("#info").find(".content").append('<h4>Tags:</h4><ul></ul>');
+    $(".info").find(".content").append('<h4>Tags:</h4><ul></ul>');
 
     $.each( thisUser.tagList, function( key, value ) {
       var i = parseInt(thisUser.tagList[key]);
-      $("#info").find("ul").append('<li>' + tagList[i] + '</li>');
+      $(".info").find("ul").append('<li>' + tagList[i] + '</li>');
     });
   }
 }
@@ -573,6 +584,7 @@ function showEditInfo(){
   $("#show-edit-info").addClass("disabled");
   var thisUser = users.user[localStorage.loggedIn];
   var infos = $("#info").find(".content").find("div");
+  
   $("#info").find(".content").prepend('<form class="form-horizontal" id="edit-info-form"></form>');
 
   $.each( infos, function( key, value ) {
@@ -591,10 +603,10 @@ function showEditInfo(){
   });
   $("#edit-info-form").append('<div class="form-group"><div class="col-md-8"><button id="edit-confirm-btn" type="button" class="btn btn-success">Save Changes</button><button id="edit-dismiss-btn" type="button" class="btn btn-danger">Dismiss</button></div></div>');
   $('#edit-confirm-btn').on("click", submitEditedInfo);
-  $('#edit-dismiss-btn').on('click', showInfo);
+  $('#edit-dismiss-btn').on('click', loadProfileData);
 }
 function submitEditedInfo(){
-
+  var thisUser = users.user[localStorage.loggedIn];
   var userLocation = $('#edit-user-location').val();
   var about = $('#edit-user-about').val();
   var interests = $('#edit-user-interests').val();
@@ -607,7 +619,7 @@ function submitEditedInfo(){
 
   users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
   localStorage.users = JSON.stringify(users); 
-  showInfo();
+  showInfo(thisUser);
 }
 
 /**TAGS TAGS TAGS**/
@@ -915,7 +927,12 @@ $.fn.deletePost = function(){
   posts.splice(postId, 1);
   localStorage.posts = JSON.stringify(posts); 
   $('#delete-post-modal').modal('hide');
-  loadGroupData();  
+  if (localStorage.viewing < 0){
+    loadGroupData();
+  }
+  else{
+    listAllUserPosts();
+  }  
 }
 
 /**ADMIN**/
@@ -923,11 +940,89 @@ function listUsersAdmin(){
   $("#admin-all-users").empty();
   $.each( users.user, function( key, value ) {
     $("#admin-all-users").append('<li class="col-xs-4"><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[key].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[key].userName + '</button></div></li>');
-    $("#admin-all-users").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">view user data</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li><li><a href="#" data-toggle="modal" data-target="#block-user-modal">block user</a></li><li><a href="#" data-toggle="modal" data-target="#delete-user-modal">delete user</a></li></ul>');
+    $("#admin-all-users").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="javascript:void(0);" onclick="$.fn.viewUserAdmin('+key+')">view user data</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li><li><a href="#" data-toggle="modal" data-target="#block-user-modal">block user</a></li><li><a href="#" data-toggle="modal" data-target="#delete-user-modal">delete user</a></li></ul>');
   });
-  $('.dropdown-toggle').on("click", $.fn.sendAdminMessage);
+  $('.dropdown-toggle').on("click", $.fn.sendMessageAdmin);
 }
+$.fn.viewUserAdmin = function(key){
+  $("#admin-all-users").hide();
+  $("#edit-info-form").remove();
+  showInfo(users.user[key]);
+  $("#users").find("h3").html(''+users.user[key].userName+'<button title="edit user" id="edit-user-admin" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-pencil"></span></button><button title="list&nbsp;all&nbsp;posts" id="list-all-posts-admin" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-list"></span></button><button title="send&nbsp;message" id="send-message-admin" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-envelope"></span></button><button title="block&nbsp;user" id="block-user" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-ban-circle"></span></button><button title="remove&nbsp;user" id="remove-user" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-remove"></span></button>');
+  localStorage.setItem("viewing", key);
+  $('#edit-user-admin').on("click", editUserAdmin);
+  $('#list-all-posts-admin').on("click", listAllUserPosts);
+}
+function dismissEdit(){
+  $("#edit-info-form").remove();
+  $.fn.viewUserAdmin(localStorage.viewing);
+}
+function editUserAdmin(){
+  $("#edit-user-admin").addClass("disabled");
+  var thisUser = users.user[localStorage.viewing];
+  var infos = $("#users").find(".content").find("div");
+  
+  $("#users").find(".content").prepend('<form class="form-horizontal" id="edit-info-form"></form>');
 
+  $.each( infos, function( key, value ) {
+    var oldId = $(infos[key]).context.id;
+    var oldValue = $(infos[key]).html();
+
+
+    if ($(infos[key]).html().length < 20){
+      $(infos[key]).html('<div class="form-group"><div class="col-md-8"><input id="edit-'+ oldId +'" name="location" type="text" value="' +  oldValue + '"class="form-control input-md"></div></div>');
+    }
+    else{
+      $(infos[key]).html('<div class="form-group"><div class="col-md-8"><textarea id="edit-'+ oldId +'" class="form-control">' +  oldValue + '</textarea></div></div>');
+    }
+    $('#edit-info-form').append($(infos[key]).prev());
+    $('#edit-info-form').append($(infos[key]));
+  
+  });
+  $("#edit-info-form").append('<div class="form-group"><div class="col-md-8"><button id="edit-confirm-btn" type="button" class="btn btn-success">Save Changes</button><button id="edit-dismiss-btn" type="button" class="btn btn-danger">Dismiss</button></div></div>');
+  $('#edit-confirm-btn').on("click", submitEditedInfoAdmin);
+  $('#edit-dismiss-btn').on('click', dismissEdit);
+}
+function submitEditedInfoAdmin(){
+  var thisUser = users.user[localStorage.viewing];
+  var userLocation = $('#edit-user-location').val();
+  var about = $('#edit-user-about').val();
+  var interests = $('#edit-user-interests').val();
+
+  var tempObj =  {
+    userLocation : userLocation, 
+    about : about, 
+    interests : interests
+  }
+
+  users.user[localStorage.viewing] = $.extend(users.user[localStorage.viewing], tempObj);
+  localStorage.users = JSON.stringify(users); 
+  $.fn.viewUserAdmin(localStorage.viewing);
+}
+function listAllUserPosts(){
+  $("#user-posts-accordion").remove();
+  $("#users").find(".content").append("<hr>");
+  $("#users").find(".content").append('<div class="panel-group" id="user-posts-accordion">');
+  var thesePosts = [];
+  for (var i = 0; i < posts.length; i++){
+    if (posts[i].memberId == localStorage.viewing){
+       thesePosts.push(posts[i]);
+    }
+  }
+
+  var realArray = $.makeArray(thesePosts);    
+  function sortByTimestamp(a, b){
+    return a.timestamp - b.timestamp;
+  }
+  realArray.reverse();
+  for (var j = 0; j < realArray.length; j++){
+    $("#user-posts-accordion").append('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">'+ realArray[j].title + '<button type="button" title="delete" class="btn btn-default btn-sm icon-two delete-post" data-toggle="modal" data-target="#delete-post-modal" data-index="'+realArray[j].postId+'"><span class="glyphicon glyphicon-remove"></button><button type="button" title="view&nbsp;post" class="btn btn-default btn-sm icon-two view-post" data-toggle="collapse" data-target="#own-post-'+ realArray[j].postId +'" data-parent="#user-posts-accordion"><span class="glyphicon glyphicon-eye-open"></button></h3></div></div>');
+    //$("#user-posts-accordion").append("hrrrm");
+    $("#user-posts-accordion").find(".panel-default:last-child").append('<div id="own-post-'+ realArray[j].postId +'" class="panel-collapse collapse post"><div class="panel-body"></div></div>');  
+    $("#own-post-"+ realArray[j].postId +"").append('<div class="post-body">' + realArray[j].post + '</div>');
+  }
+  $('.delete-post').on("click", $.fn.addPostDeleteData);
+}
 /**HANDLERS - duh! **/
 
 $("#reg-name").keyup($.fn.valName);

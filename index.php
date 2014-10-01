@@ -189,11 +189,11 @@
     <div class="row"><!-- ROW -->
       <div class="container">
         <div class="layer col-md-8"><!-- COLUMN-LEFT -->
-          <div id="info" class="page" data-menu-offset="-100">
+          <div id="info" class="info page" data-menu-offset="-100">
             <div class="well well-sm">
               <h3>Personal Info
                 <button title="add&nbsp;personal&nbsp;info" id="add-info-btn" class="btn btn-default btn-sm icon" data-toggle="modal" data-target="#add-info-modal"><span class="glyphicon glyphicon-plus"></span></button>
-                <button id="show-edit-info" title="edit personal info" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-pencil"></span></button>
+                <button title="edit personal info" id="show-edit-info" class="btn btn-default btn-sm icon"><span class="glyphicon glyphicon-pencil"></span></button>
               </h3>
             </div>     
             <div class="content">
@@ -411,7 +411,7 @@
     <div class="row"><!-- ROW -->
       <div class="container">
         <div class="layer col-md-12"><!-- COLUMN WIDE -->
-          <div id="home" class="page" data-menu-offset="-100">
+          <div id="admin" class="page" data-menu-offset="-100">
             <div class="well well-lg" data-0="background: rgba(0,0,0,0.25);" data-100="background: rgba(0,0,0,0);" >
               <h2 data-0="opacity:1" data-100="opacity: 0">Admin Area</h2>
             </div>
@@ -423,14 +423,15 @@
     <div class="row"><!-- ROW -->
       <div class="container">
         <div class="layer col-md-12"><!-- COLUMN WIDE -->
-          <div id="users" class="page" data-menu-offset="-100">
+          <div id="users" class="info page" data-menu-offset="-100">
             <div class="well well-sm">
               <h3>All Users</h3>
             </div>
             <div class="content">
               <ul id="admin-all-users">
                 <!-- DYNAMIC CONTENT-->
-              </ul>
+             </ul>
+
             </div>
           </div>
         </div><!-- /COLUMN WIDE -->
