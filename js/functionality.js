@@ -305,6 +305,8 @@ function register(){
       }
     );
     localStorage.users = JSON.stringify(users);
+    groups[0].members.push(users.user.length - 1);
+    localStorage.groups = JSON.stringify(groups);
     registerSuccess();  
   }
 }
@@ -353,6 +355,7 @@ function login(){
       localStorage.setItem("loggedIn", registeredUser);
 
       loadProfileData();
+
       if (users.user[registeredUser].blocked == true){
          alert("You have been blocked! Check your messages for the reason!");
       }
@@ -424,22 +427,28 @@ function loadGroupData(){
   listUserPosts();
 }
 function loadAdminData(){
-  listUsersAdmin();
+ listUsersAdmin();
+  listAllAdmins();
+  if (users.admin[parseInt(localStorage.admin)].newAdmin == true){
+    users.admin[parseInt(localStorage.admin)].newAdmin = false;
+    localStorage.users = JSON.stringify(users);
+    alert("Please change your password! (that's not implemented :P )");
 
+  }
 }
 function showUsers(){
   $("#public-users").children().find("ul").empty();
   $.each( users.user, function( key, value ) {
-    $("#public-user-list").append('<li><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[key].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[key].userName + '</button></div></li>');
     if (users.user[key].avatar){
-      $("#public-user-list").find('li:last-child').prepend('<img src="'+users.user[key].avatar+'" class="avatar-tiny" height="25" />');
+      $("#public-user-list").append('<li><img src="'+users.user[key].avatar+'" class="avatar-tiny" height="25" /><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[key].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[key].userName + '</button></div></li>');
     }
     else{
-      $("#public-user-list").find('li:last-child').prepend('<img src="img/black.jpg" class="avatar-tiny" height="25" />');
+      $("#public-user-list").append('<li><img src="img/black.jpg" class="avatar-tiny" height="25" /><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[key].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[key].userName + '</button></div></li>');
     }
-    $("#public-user-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">view profile</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li></ul>');
+    $("#public-user-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" class="profile-link" data-index="'+key+'" data-toggle="modal" data-target="#view-profile-modal">view profile</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li></ul>');
   });
   $('.dropdown-toggle').on("click", $.fn.addMessageDetails);
+  $('.profile-link').on("click", $.fn.addProfileDetails);
 }
 function showInfo(thisUser){
   
@@ -465,6 +474,32 @@ function showInfo(thisUser){
       $(".info").find("ul").append('<li>' + tagList[i] + '</li>');
     });
   }
+}
+function listAdminMessages(){
+  if (users.user[localStorage.loggedIn].admin){
+    for (var i = 0; i < users.user[localStorage.loggedIn].admin.length; i++){
+      var thisTimestamp = String(new Date(users.user[localStorage.loggedIn].admin[i].timestamp));
+          thisTimestamp = thisTimestamp.substr(0, 24);
+      if (users.user[localStorage.loggedIn].admin[i].read == false){
+        $("#accordion").prepend('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title"><span class="admin-msg">ADMIN</span><button type="button" title="view&nbsp;conversation" class="btn btn-default btn-sm icon-two view-admin-msg view-convo" data-toggle="collapse" data-target="#convo-admin-'+i+'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
+        $("#accordion").find(".panel-default:first-child").append('<div id="convo-admin-'+i+'" class="panel-collapse collapse convo"><div class="panel-body"></div></div>');
+        $("#convo-admin-"+ i +"").find(".panel-body").append('<div class="sender"><p class="timestamp">'+thisTimestamp+'</p>'+users.user[localStorage.loggedIn].admin[i].message+'</div>');      
+      }
+      else{
+        $("#accordion").append('<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title"><span class="admin-msg">ADMIN</span><button type="button" title="view&nbsp;conversation" class="btn btn-default btn-sm icon-two view-convo" data-toggle="collapse" data-target="#convo-admin-'+i+'" data-parent="#accordion"><span class="glyphicon glyphicon-eye-open"></h3></div></div>');
+        $("#accordion").find(".panel-default:last-child").append('<div id="convo-admin-'+i+'" class="panel-collapse collapse convo"><div class="panel-body"></div></div>');
+        $("#convo-admin-"+ i +"").find(".panel-body").append('<div class="sender"><p class="timestamp">'+thisTimestamp+'</p>'+users.user[localStorage.loggedIn].admin[i].message+'</div>');      
+      }
+    }
+  }
+  $(".view-admin-msg").on("click", $.fn.adminMessageRead);
+}
+$.fn.adminMessageRead = function(){
+
+  var target = $(this).data("target");
+  target = target.substr(13, target.length);
+  users.user[localStorage.loggedIn].admin[target].read = true;
+  localStorage.users = JSON.stringify(users);
 }
 function listMessages(){
 
@@ -567,6 +602,21 @@ function listMessages(){
     $("#accordion .panel-collapse").removeClass('in');
             //show the account_last visible group
     $("#" + last).addClass("in");
+  }
+  listAdminMessages();
+}
+
+/** VIEW PROFILE **/
+
+$.fn.addProfileDetails = function(){
+  var index = $(this).data("index");
+  $("#view-profile-label").html(""+ users.user[index].userName +"");
+  if (users.user[index].avatar){
+    $("#view-profile-label").append('<img src="'+users.user[index].avatar+'" class="avatar-img" height="100" />');
+  }
+  showInfo(users.user[index]);
+  if ($("#view-profile-modal").find(".content").is(':empty')){
+    $("#view-profile-modal").find(".content").html(users.user[index].userName + " has no Info public!")
   }
 }
 
@@ -706,7 +756,6 @@ $.fn.setModalMessageData = function(){
     var senderId = "admin";
   }
   var receiverId = $(this).data("index");
-  console.log(receiverId);
   var message = $("#message-in-modal").val();
   var timestamp = Date.now();
 
@@ -725,7 +774,13 @@ $.fn.setListMessageData = function(){
   listMessages();
 }
 $.fn.sendMessage = function(senderId, receiverId, message, timestamp){
-  if (message != "" && users.user[senderId].blocked == false){
+  var sendable = true;
+  if (localStorage.loggedIn > -1){
+    if(message == "" || users.user[senderId].blocked == true){
+      sendable = false;
+    }
+  }
+  if (sendable == true){
     if (!users.user[parseInt(receiverId)][senderId]){
       var tempObj =  {};
     
@@ -733,9 +788,12 @@ $.fn.sendMessage = function(senderId, receiverId, message, timestamp){
         message : message,
         timestamp : timestamp
       }];
+      if (senderId == "admin"){
+        tempObj[senderId].push({read : false});
+      }
     
       users.user[parseInt(receiverId)] = $.extend(users.user[parseInt(receiverId)], tempObj);
-      localStorage.users = JSON.stringify(users); 
+      //localStorage.users = JSON.stringify(users); 
    
     }
     else{
@@ -743,6 +801,9 @@ $.fn.sendMessage = function(senderId, receiverId, message, timestamp){
       var tempObj = {
         message: message, 
         timestamp : timestamp
+      }
+      if (senderId == "admin"){
+        tempObj = $.extend(tempObj, {read : false});
       }
       users.user[parseInt(receiverId)][senderId].push(tempObj);
     }
@@ -755,9 +816,9 @@ $.fn.sendMessage = function(senderId, receiverId, message, timestamp){
           timestamp : timestamp,
           receiverId : receiverId
         }];
-      
+          
         users.user[senderId] = $.extend(users.user[senderId], tempObj);
-        localStorage.users = JSON.stringify(users); 
+        //localStorage.users = JSON.stringify(users); 
       }
       else{
         var tempObj = {
@@ -771,8 +832,10 @@ $.fn.sendMessage = function(senderId, receiverId, message, timestamp){
     }
     localStorage.users = JSON.stringify(users); 
   }
-  if (users.user[senderId].blocked == true){
-    alert("You can not send messages!");
+  if (localStorage.loggedIn > -1){
+    if (users.user[senderId].blocked == true){
+      alert("You can not send messages!");
+    }
   }
   $('#send-message-modal').modal('hide');
 }
@@ -788,29 +851,69 @@ function resizeMessageInput(currentDiv){
 function startNewGroup(){
   
 }
-function joinGroup(){
+function setJoinGroupData(groupId){
+  if(groups[groupId].privacyStatus == "public"){
+    $("#join-group-label").html('The group <span class="group-name">' + groups[groupId].groupName + '</span> is open, so you will be seen by all members right away. Do you want to join?');
+    $("#join-group-confirm").data("group-id", groupId);
+    $("#join-group-confirm").on("click", $.fn.joinOpenGroup);
+  }
+}
+$.fn.setLeaveGroupData = function(){
+    var groupId = $(this).data("index");
+    $("#leave-group-label").html('Do you really want to leave <span class="group-name">' + groups[groupId].groupName + '</span> ?');
+    $("#leave-group-confirm").data("group-id", groupId);
+}
+$.fn.joinOpenGroup = function(){
+  var groupId = $(this).data("group-id");
+  var memberId = localStorage.loggedIn;
 
+  groups[groupId].members.push(parseInt(memberId));
+  localStorage.groups = JSON.stringify(groups);
+
+  showUserGroups();
+  showPublicGroups();
+  $("#join-group-modal").modal('hide');
+}
+$.fn.leaveGroup = function(){
+  
+  var groupId = $(this).data("group-id");
+  var memberId = localStorage.loggedIn;
+  var memberIndex = groups[groupId].members.indexOf(parseInt(memberId));
+
+  groups[groupId].members.splice(memberIndex, 1);
+  localStorage.groups = JSON.stringify(groups);
+
+  showUserGroups();
+  showPublicGroups();
+  $("#leave-group-modal").modal('hide');
 }
 function showPublicGroups(){
+  $("#public-group-list").empty();
   for (var i = 0; i < groups.length; i++){
-    $("#public-group-list").append('<li><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+ i +'" data-user="'+ groups[i].groupName +'" data-toggle="dropdown"><span class="caret"></span> ' + groups[i].groupName + '</button></div></li>');
-    $("#public-group-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">join&nbsp;group</a></li></ul>');
+    var isMember = false;
+    for (var j = 0; j < groups[i].members.length; j++){
+      if (groups[i].members[j] == localStorage.loggedIn){
+        isMember = true;
+      }
+    }  
+    if (isMember == false){
+      $("#public-group-list").append('<li><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+ i +'" data-user="'+ groups[i].groupName +'" data-toggle="dropdown"><span class="caret"></span> ' + groups[i].groupName + '</button></div></li>');
+      $("#public-group-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="javascript:void(0);" onclick="setJoinGroupData('+i+')" data-toggle="modal" data-target="#join-group-modal">join&nbsp;group</a></li></ul>');
+    }
   }
-
 }
 function showUserGroups(){
   $("#group-list").empty();
   for (var i = 0; i < groups.length; i++){
     for (var j = 0; j < groups[i].members.length; j++){
       if (groups[i].members[j] == localStorage.loggedIn){
-        $("#group-list").append('<h3 class="group-item">'+ groups[i].groupName + '<button type="button" title="leave&nbsp;group" class="leave-group-btn btn btn-default btn-sm icon-two"><span class="glyphicon glyphicon-remove"></span></button><button type="button" title="view&nbsp;group" class="btn view-group-btn btn-default btn-sm icon-two" data-index="'+i+'"><span class="glyphicon glyphicon-eye-open"></h3>');       
-        
+        $("#group-list").append('<h3 class="group-item">'+ groups[i].groupName + '<button type="button" title="leave&nbsp;group" class="leave-group-btn btn btn-default btn-sm icon-two" data-index="'+i+'" data-toggle="modal" data-target="#leave-group-modal"><span class="glyphicon glyphicon-remove"></span></button><button type="button" title="view&nbsp;group" class="btn view-group-btn btn-default btn-sm icon-two" data-index="'+i+'"><span class="glyphicon glyphicon-eye-open"></h3>');       
+        $(".leave-group-btn").on("click", $.fn.setLeaveGroupData);
       }
     }
   }
   $('.view-group-btn').on("click", $.fn.viewGroup);
 }
-
 $.fn.viewGroup = function(){
   localStorage.setItem("groupView", $(this).data("index"));
   window.scrollTo(0, 0);
@@ -820,18 +923,17 @@ function leaveGroupView(){
   localStorage.setItem("groupView", "-1");
   window.scrollTo(0, 0);
   location.reload();
-
 }
 function showMembers(){
  $("#member-list").empty();
   $.each( groups[localStorage.groupView].members, function( key, value ) {
     $("#member-list").append('<li><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[groups[localStorage.groupView].members[key]].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[groups[localStorage.groupView].members[key]].userName + '</button></div></li>');
     $("#member-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">view profile</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li></ul>');
-    if (users.user[key].avatar){
-      $("#public-user-list").find('li:last-child').prepend('<img src="'+users.user[key].avatar+'" class="avatar-tiny" height="25" />');
+    if (users.user[groups[localStorage.groupView].members[key]].avatar){
+      $("#member-list").find('li:last-child').prepend('<img src="'+users.user[groups[localStorage.groupView].members[key]].avatar+'" class="avatar-tiny" height="25" />');
     }
     else{
-      $("#public-user-list").find('li:last-child').prepend('<img src="img/black.jpg" class="avatar-tiny" height="25" />');
+      $("#member-list").find('li:last-child').prepend('<img src="img/black.jpg" class="avatar-tiny" height="25" />');
     }
   });
   $('.dropdown-toggle').on("click", $.fn.addMessageDetails);
@@ -979,10 +1081,12 @@ $.fn.deletePost = function(){
 /** SETTINGS **/
 function showSettings(){
   avatarSetting();
+  showEmail();
 }
 function avatarSetting(){
+  $("#avatar").empty();
   if (users.user[localStorage.loggedIn].avatar){
-    $("#avatar").prepend('<img src="'+users.user[localStorage.loggedIn].avatar+'" class="avatar-img" height="100" /><br><button type="button" id="change-avatar" class="btn btn-default">Change</button>')
+    $("#avatar").prepend('<img src="'+users.user[localStorage.loggedIn].avatar+'" class="avatar-img" height="100" /><br><button type="button" id="change-avatar" class="btn btn-default settings">Change</button><div id="fileDisplayArea"></div>')
     $("#change-avatar").on("click", uploadAvatar);
   }
   else{
@@ -990,8 +1094,8 @@ function avatarSetting(){
   }
 }
 function uploadAvatar(){
-   
-    $("#avatar").append('<input type="file" id="avatar-input"><button type="button" id="set-avatar">set as avatar</button>'); 
+    
+    $("#avatar").append('<div id="fileDisplayArea"></div><input type="file" id="avatar-input"><button type="button" id="set-avatar">set as avatar</button>'); 
 
     var fileInput = document.getElementById('avatar-input');
     var fileDisplayArea = document.getElementById('fileDisplayArea');
@@ -1027,6 +1131,36 @@ function setAvatar(){
     localStorage.users = JSON.stringify(users);
   }
 }
+function showEmail(){
+  $("#email").empty();
+  if (users.user[localStorage.loggedIn].email.length > 3){
+    $("#email").append("<p>"+users.user[localStorage.loggedIn].email+"</p><br><button type='button' class= 'btn btn-default settings' id='change-email'>change</button>")
+    $("#change-email").on("click", showChangeEmail);
+  }
+  else{
+    $("#email").append('<p>to retrieve a lost password in future, you can set an email address</p><div class="form-group"><div class="col-md-12"><input name="email" type="text" placeholder="" class="form-control input-md email-settings"></div></div><button type="button" class="set-email">submit</button>')
+    $(".email-settings").keyup($.fn.valEmail);
+    $(".set-email").on("click", setEmail);
+  }
+}
+function setEmail(){
+  var noSubmit = false;
+  var email = $(".email-settings").val();
+  if ($(".email-settings").valEmail() == false){
+    noSubmit = true;
+  }
+  if (noSubmit == false){
+    users.user[localStorage.loggedIn].email = email;
+    localStorage.users = JSON.stringify(users);
+    showSettings();
+  }
+}
+function showChangeEmail(){
+  var oldEmail = $("#email").find("p").html();
+  $("#email").find("p").html('<div class="form-group"><div class="col-md-12"><input name="email" type="text" value="'+oldEmail+'" class="email-settings form-control input-md"></div></div><button type="button" class="set-email">submit</button>')
+  $(".email-settings").keyup($.fn.valEmail);
+  $(".set-email").on("click", setEmail);
+}
 
 /**ADMIN**/
 function listUsersAdmin(){
@@ -1039,6 +1173,7 @@ function listUsersAdmin(){
   $('.dropdown-toggle').on("click", $.fn.sendMessageAdmin);
 }
 $.fn.viewUserAdmin = function(key){
+  console.log("called");
   $("#admin-all-users").hide();
   $("#edit-info-form").remove();
   showInfo(users.user[key]);
@@ -1142,6 +1277,51 @@ $.fn.deleteUser = function(){
     localStorage.users = JSON.stringify(users); 
   }
 }
+function listAllAdmins(){
+  $("#all-admins").empty();
+  $.each( users.admin, function( key, value ) {
+    $("#all-admins").append("<li class='col-xs-4'>"+users.admin[key].adminName+"</li>");
+  });
+}
+function registerAdmin(){
+  var name = $("#reg-admin-name").val();
+  var password = $("#reg-admin-password").val();
+
+  var noSubmit = false;
+  var nameExists = false;
+ 
+  if ($("#reg-admin-name").valName() == false){
+    noSubmit = true;
+  }
+  if ($("#reg-admin-password").valPassword() == false){
+    noSubmit = true;
+  }
+  if ($("#reg-admin-repeat").valRepeat() == false){
+    noSubmit = true;
+  }
+  if (users.admin.length > 0){
+    for (var i = 0; i < users.admin.length; i++){
+      if (users.admin[i].adminName == name){
+        noSubmit = true;
+        nameExists = true;
+        userNameExists();
+      }       
+    }
+  }
+  if (noSubmit == false && nameExists == false){
+    var passwordCrypt = sjcl.encrypt("password", password);
+    users.admin.push( 
+      {
+        adminName: name, 
+        password : passwordCrypt,
+        newAdmin : true
+      }
+    );
+    localStorage.users = JSON.stringify(users); 
+  }
+  listAllAdmins();
+  $('#register-admin-modal').modal('hide');
+}
 /**HANDLERS - duh! **/
 
 $("#reg-name").keyup($.fn.valName);
@@ -1149,6 +1329,13 @@ $("#reg-password").keyup($.fn.valPassword);
 $("#reg-repeat").keyup($.fn.valRepeat);
 $("#reg-email").keyup($.fn.valEmail);
 $('#register-confirm').on("click", register);
+
+$("#reg-admin-name").keyup($.fn.valName);
+$("#reg-admin-password").keyup($.fn.valPassword);
+$("#reg-admin-repeat").keyup($.fn.valRepeat);
+$("#reg-admin-email").keyup($.fn.valEmail);
+$('#register-admin-confirm').on("click", registerAdmin);
+
 $('#log-in-confirm').on("click", login);
 $('#log-out-confirm').on("click", logout);
 $('#add-info-btn').on("click", addInfoForm);
@@ -1159,3 +1346,4 @@ $('#send-message-from-modal-confirm').on("click", $.fn.setModalMessageData);
 $('#send-message-from-list-confirm').on("click", $.fn.setListMessageData);
 $('#new-post-confirm').on("click", newPost);
 $('#delete-post-confirm').on("click", $.fn.deletePost);
+$("#leave-group-confirm").on("click", $.fn.leaveGroup);

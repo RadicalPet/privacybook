@@ -3,6 +3,7 @@
 var users;
 var posts = [];
 
+
 var tagList = ["nothing","something", "other stuff", "bullshit", "more garbage", "fuck that shit"
 ];
 localStorage.setItem("tagList", JSON.stringify(tagList));
@@ -10,25 +11,32 @@ localStorage.setItem("tagList", JSON.stringify(tagList));
 var groups = [
   {
     groupName : "public",
-    members : [1, 3],
+    members : [0, 1, 2],
     tags : [0, 4],
-    admin : [4]
+    admin : [-1],
+    privacyStatus : "public"
   },
   {
     groupName : "whatever",
-    members : [2, 4],
+    members : [2],
     tags : [3, 5],
-    admin : [3]
+    admin : [2],
+    privacyStatus : "public"
   },
   {
     groupName : "one more group",
-    members : [0, 1, 2, 4],
+    members : [1],
     tags : [3, 5, 1, 2],
-    admin : [1]
+    admin : [1],
+    privacyStatus : "public"
   }
 ]
-localStorage.setItem("groups", JSON.stringify(groups));
-
+if (localStorage.groups){
+  groups = JSON.parse(localStorage.groups);
+}
+else {
+  localStorage.setItem("groups", JSON.stringify(groups));
+}
 
 
 if(localStorage.users){
@@ -52,7 +60,7 @@ else{
         "deleted" : false  
       }
     ],
-    "admin":[
+  "admin":[
       {
         "adminName" : "Admin",
         "password" : "{\"iv\":\"yyWA4e/OTfFypGtXL7DmWQ\",\"v\":1,\"iter\":1000,\"ks\":128,\"ts\":64,\"mode\":\"ccm\",\"adata\":\"\",\"cipher\":\"aes\",\"salt\":\"KI1omqmb5YI\",\"ct\":\"dpPfpOk7kj1Ouko+HPwM8Iz70IU\"}"

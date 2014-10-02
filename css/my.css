@@ -473,7 +473,7 @@ h3.group-item > .tooltip.top .tooltip-arrow {
 #settings .avatar-img{
   margin-left: 30px;
 }
-#change-avatar{
+.settings{
   margin-left: 30px;
   width: 100px;
   margin-bottom: 30px;
@@ -487,4 +487,27 @@ h3.group-item > .tooltip.top .tooltip-arrow {
 #set-avatar{
   margin-left: 30px;
 }
+#email > p{
+  padding-left: 30px;
+}
+#email-settings{
+  margin-left: 15px; 
+}
+#email > button{
+  margin-left: 30px; 
+}
+#settings > hr{
 
+}
+.group-name{
+  color:  #9BE4FF;
+}
+#all-admins{
+  list-style: none;
+  padding-top: 35px;
+  padding-bottom: 35px;
+
+}
+.modal-title > .avatar-img{
+  margin-left: 30px;
+}

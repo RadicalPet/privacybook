@@ -298,12 +298,32 @@
               <h3>Settings</h3>
             </div>
             <div class="content">
-            <h4>Avatar</h4>
-              <div id="avatar">
-                
-                <div id="fileDisplayArea"></div>
-
-              </div>
+              <div class="row"><!-- ROW -->
+                <div class="col-md-3">   
+                  <h4>Avatar<hr></h4>
+                  <div id="avatar">
+                    
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <h4>Email<hr></h4>
+                  <div id="email">
+                    
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <h4>Password<hr></h4>
+                  <div id="password">
+                    
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <h4>Privacy Settings<hr></h4>
+                  <div id="privacy">
+                    
+                  </div>
+                </div>
+              </div><!-- /ROW -->
             </div>
           </div>
         </div><!-- /COLUMN WIDE -->
@@ -311,10 +331,7 @@
     </div><!-- /ROW -->
   
     <div class="page" data-menu-offset="-100">
-      <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-      <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-      <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-      <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+      
     </div>
   </div>
 <!-- / LOGGED IN -->
@@ -434,6 +451,27 @@
             </div>
             <div class="content">
               <ul id="admin-all-users">
+                <!-- DYNAMIC CONTENT-->
+             </ul>
+
+            </div>
+          </div>
+        </div><!-- /COLUMN WIDE -->
+      </div>
+    </div><!-- /ROW -->
+
+    <div class="row"><!-- ROW -->
+      <div class="container">
+        <div class="layer col-md-12"><!-- COLUMN WIDE -->
+          <div id="new-admin" class="info page" data-menu-offset="-100">
+            <div class="well well-sm">
+              <h3>
+                All Admins
+                 <button title="register&nbsp;new&nbsp;admin" id="add-info-btn" class="btn btn-default btn-sm icon" data-toggle="modal" data-target="#register-admin-modal"><span class="glyphicon glyphicon-plus"></span></button>
+              </h3>
+            </div>
+            <div class="content">
+              <ul id="all-admins">
                 <!-- DYNAMIC CONTENT-->
              </ul>
 
@@ -644,7 +682,7 @@
   </div>
 
   <!-- Modal SEND MESSAGE -->
- <div class="modal fade" id="send-message-modal" tabindex="0" role="dialog" aria-labelledby="sendMessageModal" aria-hidden="true">
+  <div class="modal fade" id="send-message-modal" tabindex="0" role="dialog" aria-labelledby="sendMessageModal" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
          <div class="modal-header">
@@ -683,6 +721,36 @@
     </div>
   </div>
 
+  <!-- Modal VIEW PROFILE -->
+
+  <div class="modal fade" id="view-profile-modal" tabindex="0" role="dialog" aria-labelledby="viewProfileModal" aria-hidden="true">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              &times;
+            </button>
+            <h4 class="modal-title" id="view-profile-label">
+              <!-- CONTENT DYNAMIC --> 
+            </h4>
+          </div>
+        <div class="modal-body">
+          <div class="info">
+            <div class="content">
+              <!-- CONTENT DYNAMIC -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <!-- Modal DELETE POST-->
   <div class="modal fade" id="delete-post-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -709,6 +777,120 @@
       </div><!-- /.modal-content -->
     </div><!-- /.modal -->
   </div>
+
+  <!-- Modal JOIN GROUP -->
+  <div class="modal fade" id="join-group-modal" tabindex="0" role="dialog" aria-labelledby="sendMessageModal" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              &times;
+            </button>
+            <h4 class="modal-title" id="join-group-label">
+              <!-- CONTENT DYNAMIC --> 
+            </h4>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Dismiss
+          </button>
+          <button id="join-group-confirm" type="button" class="btn btn-primary">
+            Join
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+   <!-- Modal LEAVE GROUP -->
+  <div class="modal fade" id="leave-group-modal" tabindex="0" role="dialog" aria-labelledby="sendMessageModal" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              &times;
+            </button>
+            <h4 class="modal-title" id="leave-group-label">
+              <!-- CONTENT DYNAMIC --> 
+            </h4>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Dismiss
+          </button>
+          <button id="leave-group-confirm" type="button" class="btn btn-primary">
+            Leave
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal REGISTER NEW ADMIN -->
+  <div class="modal fade" id="register-admin-modal" tabindex="0" role="dialog" aria-labelledby="registerAdminModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            &times;
+          </button>
+          <h4 class="modal-title" id="register-label">
+            Register New Admin
+          </h4>
+        </div>
+        <div class="modal-body">
+       
+          <form class="form-horizontal">
+          <fieldset>
+
+            <div class="form-group">
+              <label class="col-md-4 control-label" for="reg-admin-name"></label>
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-addon">nickname</span>
+                  <input id="reg-admin-name" name="reg-name" class="form-control" placeholder="" type="text" required="">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-md-4 control-label" for="reg-admin-password"></label>
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-addon">password</span>
+                  <input id="reg-admin-password" type="password" name="reg-admin-password" class="form-control" placeholder="" required="">
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="col-md-4 control-label" for="reg-admin-repeat">repeat</label>
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-addon">password</span>
+                  <input id="reg-admin-repeat" type="password" name="reg-password-repeat" class="form-control" placeholder="" required="">
+                </div>  
+              </div>
+            </div>
+          
+          </fieldset>
+          </form>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Close
+          </button>
+          <button id="register-admin-confirm" type="button" class="btn btn-primary">
+            Register
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 <!-- SCRIPTS -->
 
