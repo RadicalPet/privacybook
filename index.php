@@ -178,6 +178,7 @@
           <div id="home" class="page" data-menu-offset="-100">
             <div class="well well-lg" data-0="background: rgba(0,0,0,0.25);" data-100="background: rgba(0,0,0,0);" >
               <h2 data-0="opacity:1" data-100="opacity: 0">Profile Page</h2>
+
             </div>
           </div> 
         </div><!-- /COLUMN WIDE -->
@@ -297,8 +298,12 @@
               <h3>Settings</h3>
             </div>
             <div class="content">
+            <h4>Avatar</h4>
+              <div id="avatar">
+                
+                <div id="fileDisplayArea"></div>
 
-            
+              </div>
             </div>
           </div>
         </div><!-- /COLUMN WIDE -->

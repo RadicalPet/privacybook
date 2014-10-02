@@ -396,10 +396,15 @@ function logout(){
 
 function loadProfileData(){
 
+
   var i = parseInt(localStorage.getItem("loggedIn"));
   var thisUser = users.user[localStorage.loggedIn];
   var userName = users.user[i].userName;
   $("#home").find("h2").html(userName);
+  if (thisUser.avatar){
+    $("#home").find(".well-lg").append('<img src="'+thisUser.avatar+'" class="avatar-img" height="100" />');
+  }
+
   if (thisUser.blocked == true){
     $("#home").find("h2").append("<span class='blocked'>&nbsp;&nbsp;&nbsp;(BLOCKED! If you want to appeal the block write an email to admin@privacybook.net)</span>");
   }
@@ -408,6 +413,7 @@ function loadProfileData(){
   listMessages();
   showUserGroups();
   showPublicGroups();
+  showSettings();
 }
 function loadGroupData(){
   var i = parseInt(localStorage.getItem("groupView"));
@@ -425,6 +431,12 @@ function showUsers(){
   $("#public-users").children().find("ul").empty();
   $.each( users.user, function( key, value ) {
     $("#public-user-list").append('<li><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[key].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[key].userName + '</button></div></li>');
+    if (users.user[key].avatar){
+      $("#public-user-list").find('li:last-child').prepend('<img src="'+users.user[key].avatar+'" class="avatar-tiny" height="25" />');
+    }
+    else{
+      $("#public-user-list").find('li:last-child').prepend('<img src="img/black.jpg" class="avatar-tiny" height="25" />');
+    }
     $("#public-user-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">view profile</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li></ul>');
   });
   $('.dropdown-toggle').on("click", $.fn.addMessageDetails);
@@ -815,6 +827,12 @@ function showMembers(){
   $.each( groups[localStorage.groupView].members, function( key, value ) {
     $("#member-list").append('<li><div class="btn-group"><button type="button" class="btn btn-default dropdown-toggle"  data-index="'+key+'" data-user="'+ users.user[groups[localStorage.groupView].members[key]].userName +'" data-toggle="dropdown"><span class="caret"></span> ' + users.user[groups[localStorage.groupView].members[key]].userName + '</button></div></li>');
     $("#member-list").find('li:last-child').find('div').append('<ul class="dropdown-menu" role="menu"><li><a href="#" data-toggle="modal" data-target="profile-modal">view profile</a></li><li><a href="#" data-toggle="modal" data-target="#send-message-modal">send message</a></li></ul>');
+    if (users.user[key].avatar){
+      $("#public-user-list").find('li:last-child').prepend('<img src="'+users.user[key].avatar+'" class="avatar-tiny" height="25" />');
+    }
+    else{
+      $("#public-user-list").find('li:last-child').prepend('<img src="img/black.jpg" class="avatar-tiny" height="25" />');
+    }
   });
   $('.dropdown-toggle').on("click", $.fn.addMessageDetails);
 }
@@ -956,6 +974,58 @@ $.fn.deletePost = function(){
   else{
     listAllUserPosts();
   }  
+}
+
+/** SETTINGS **/
+function showSettings(){
+  avatarSetting();
+}
+function avatarSetting(){
+  if (users.user[localStorage.loggedIn].avatar){
+    $("#avatar").prepend('<img src="'+users.user[localStorage.loggedIn].avatar+'" class="avatar-img" height="100" /><br><button type="button" id="change-avatar" class="btn btn-default">Change</button>')
+    $("#change-avatar").on("click", uploadAvatar);
+  }
+  else{
+    uploadAvatar();
+  }
+}
+function uploadAvatar(){
+   
+    $("#avatar").append('<input type="file" id="avatar-input"><button type="button" id="set-avatar">set as avatar</button>'); 
+
+    var fileInput = document.getElementById('avatar-input');
+    var fileDisplayArea = document.getElementById('fileDisplayArea');
+
+    fileInput.addEventListener('change', function(e) {
+      var file = fileInput.files[0];
+      var imageType = /image.*/
+
+      if (file.type.match(imageType)) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          fileDisplayArea.innerHTML = "";
+
+          var img = new Image();
+          img.src = reader.result;
+          img.width = 200;
+          localStorage.setItem("img", reader.result);
+          fileDisplayArea.appendChild(img);
+        }
+        reader.readAsDataURL(file);
+
+      } 
+      else {
+        fileDisplayArea.innerHTML = "File not supported!"
+      }
+    });
+    $("#set-avatar").on("click", setAvatar);
+} 
+function setAvatar(){
+  if (localStorage.img){
+    users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], {avatar : localStorage.img});
+    localStorage.users = JSON.stringify(users);
+  }
 }
 
 /**ADMIN**/

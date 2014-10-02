@@ -465,3 +465,26 @@ h3.group-item > .tooltip.top .tooltip-arrow {
   font-size: 70%;
   color: red;
 }
+#home .avatar-img{
+  position: relative;
+  float: right;
+  margin-top: -65px;
+}
+#settings .avatar-img{
+  margin-left: 30px;
+}
+#change-avatar{
+  margin-left: 30px;
+  width: 100px;
+  margin-bottom: 30px;
+}
+#fileDisplayArea{
+  margin-left: 30px;
+}
+#avatar-input{
+  margin-left: 30px;
+}
+#set-avatar{
+  margin-left: 30px;
+}
+
