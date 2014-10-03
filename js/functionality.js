@@ -467,12 +467,15 @@ function showInfo(thisUser){
     $(".info").find(".content").append('<h4>Interests:</h4><div class="user-info" id="user-interests">' + thisUser.interests + '</div>');
   }
   if (thisUser.tagList){
-    $(".info").find(".content").append('<h4>Tags:</h4><ul></ul>');
+    $(".info").find(".content").append('<hr><h4>Tags:<button title="add&nbsp;tags" class="btn btn-default btn-sm icon-two add-tags-btn" onclick="restOfTagsAsCheckboxes()"><span class="glyphicon glyphicon-plus"></span></button></h4><ul></ul>');
 
     $.each( thisUser.tagList, function( key, value ) {
       var i = parseInt(thisUser.tagList[key]);
-      $(".info").find("ul").append('<li>' + tagList[i] + '</li>');
+      $(".info").find("ul").append('<li class="col-xs-3"><span class="taggy">' + tagList[i] + '<span class="remove-tag" onclick="removeTag('+key+')">&nbsp;&nbsp;X</span></span></li>');
     });
+  }
+  if (!thisUser.tagList){
+     $(".info").find(".content").append('<hr><h4>Tags:<button title="add&nbsp;tags" class="btn btn-default btn-sm icon-two add-tags-btn" onclick="restOfTagsAsCheckboxes()"><span class="glyphicon glyphicon-plus"></span></button></h4><ul></ul>');
   }
 }
 function listAdminMessages(){
@@ -605,7 +608,6 @@ function listMessages(){
   }
   listAdminMessages();
 }
-
 /** VIEW PROFILE **/
 
 $.fn.addProfileDetails = function(){
@@ -616,8 +618,11 @@ $.fn.addProfileDetails = function(){
   }
   showInfo(users.user[index]);
   if ($("#view-profile-modal").find(".content").is(':empty')){
-    $("#view-profile-modal").find(".content").html(users.user[index].userName + " has no Info public!")
+    $("#view-profile-modal").find(".content").html(users.user[index].userName + " has no Info public!");
   }
+  $("#view-profile-modal").find(".add-tags-btn").remove();
+  $("#view-profile-modal").find(".remove-tag").remove();
+
 }
 
 /**ADD INFO**/
@@ -648,6 +653,7 @@ function addInfo(){
   users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
   localStorage.users = JSON.stringify(users); 
   $('#add-info-modal').modal('hide'); 
+  location.reload();
 }
 
 /**EDITING**/
@@ -698,32 +704,53 @@ function submitEditedInfo(){
 /**TAGS TAGS TAGS**/
 
 function restOfTagsAsCheckboxes(){
+  $(".add-tags-btn").addClass("disabled");
+
   var thisUser = users.user[localStorage.loggedIn];
-  $('#info').find(".content").append('<form id="tag-checkbox" class="form-horizontal"><fieldset><div class="form-group"></div></fieldset></form>');
+  $('#info').find(".content").append('<hr><form id="tag-checkbox" class="form-horizontal"><fieldset><div class="form-group"></div></fieldset></form>');
 
   for (var i = 0; i < tagList.length; i++){
     var doNotAdd = false;
     var str = String(i);
-    for (var j = 0; j < thisUser.tagList.length; j++){
-      if (str == thisUser.tagList[j]){
-        doNotAdd = true;
+    if (thisUser.tagList){
+      for (var j = 0; j < thisUser.tagList.length; j++){
+        if (str == thisUser.tagList[j]){
+          doNotAdd = true;
+        }
       }
     }
     if (!doNotAdd){
-      $('#tag-checkbox').find(".form-group").append('<div class="checkbox"><label for="tags-'+ str +'">' + tagList[i] + '<input type="checkbox" class="tags" id="tags-'+ str +'" value="'+ str +'"></label></div>');   
+      $('#tag-checkbox').find(".form-group").append('<div class="checkbox col-xs-4"><label for="tags-'+ str +'">' + tagList[i] + '<input type="checkbox" class="tags" id="tags-'+ str +'" value="'+ str +'"></label></div>');   
     }
   }
   $('#tag-checkbox').append('<button id="add-tags-to-user" type="button" class="btn btn-primary">Submit</button>') 
   $('#add-tags-to-user').on("click", addTagsToUser);
 }
 function addTagsToUser(){
+  $("#add-tags-btn").removeClass("disabled");
   var thisUser = users.user[localStorage.loggedIn];
   var tags = $('input:checkbox:checked').map(function() { return this.value;}).get();
   
   var tempObj =  {tagList : tags};
-
-  users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
-  localStorage.users = JSON.stringify(users); 
+  if (tags.length > 0){
+    if (!thisUser.tagList){
+      users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], tempObj);
+    }
+    else{
+      console.log(tags);
+      console.log(users.user[localStorage.loggedIn].tagList);
+      users.user[localStorage.loggedIn].tagList = users.user[localStorage.loggedIn].tagList.concat(tags);
+    }
+    localStorage.users = JSON.stringify(users); 
+  }
+  $('#tag-checkbox').remove();
+  showInfo(thisUser);
+}
+function removeTag(index){
+  console.log(index);
+  users.user[localStorage.loggedIn].tagList.splice(index, 1);
+  localStorage.users = JSON.stringify(users);
+  showInfo(users.user[localStorage.loggedIn]);
 }
 
 /**MESSAGING STUFF**/
@@ -793,7 +820,7 @@ $.fn.sendMessage = function(senderId, receiverId, message, timestamp){
       }
     
       users.user[parseInt(receiverId)] = $.extend(users.user[parseInt(receiverId)], tempObj);
-      //localStorage.users = JSON.stringify(users); 
+      localStorage.users = JSON.stringify(users); 
    
     }
     else{
@@ -818,7 +845,7 @@ $.fn.sendMessage = function(senderId, receiverId, message, timestamp){
         }];
           
         users.user[senderId] = $.extend(users.user[senderId], tempObj);
-        //localStorage.users = JSON.stringify(users); 
+        localStorage.users = JSON.stringify(users); 
       }
       else{
         var tempObj = {
@@ -1130,6 +1157,7 @@ function setAvatar(){
     users.user[localStorage.loggedIn] = $.extend(users.user[localStorage.loggedIn], {avatar : localStorage.img});
     localStorage.users = JSON.stringify(users);
   }
+  location.reload();
 }
 function showEmail(){
   $("#email").empty();
@@ -1347,3 +1375,5 @@ $('#send-message-from-list-confirm').on("click", $.fn.setListMessageData);
 $('#new-post-confirm').on("click", newPost);
 $('#delete-post-confirm').on("click", $.fn.deletePost);
 $("#leave-group-confirm").on("click", $.fn.leaveGroup);
+
+

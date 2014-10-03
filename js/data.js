@@ -8,17 +8,23 @@ var tagList = ["nothing","something", "other stuff", "bullshit", "more garbage",
 ];
 localStorage.setItem("tagList", JSON.stringify(tagList));
 
-var groups = [
+var groups = [];
+
+if (localStorage.groups){
+  groups = JSON.parse(localStorage.groups);
+}
+else {
+  groups = [
   {
     groupName : "public",
-    members : [0, 1, 2],
+    members : [0, 1],
     tags : [0, 4],
     admin : [-1],
     privacyStatus : "public"
   },
   {
     groupName : "whatever",
-    members : [2],
+    members : [0],
     tags : [3, 5],
     admin : [2],
     privacyStatus : "public"
@@ -30,11 +36,7 @@ var groups = [
     admin : [1],
     privacyStatus : "public"
   }
-]
-if (localStorage.groups){
-  groups = JSON.parse(localStorage.groups);
-}
-else {
+  ]
   localStorage.setItem("groups", JSON.stringify(groups));
 }
 
