@@ -55,7 +55,7 @@ ________________________________________________________________________________
 
 
 As I understood we are not allowed to use anything else than localstorage for storing data.
-We are required to use Twwitter bootstrap.
+We are required to use Twitter bootstrap.
 
 As of now I am using the following libraries, plugins and snippets:
 
